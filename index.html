@@ -40,6 +40,7 @@
                 <a href="#reservation" class="nav-link">Reservations</a>
                 <a href="#testimonials" class="nav-link">Reviews</a>
                 <a href="#contact" class="nav-link">Contact</a>
+                <a href="#chatbot" class="nav-link">AI Assistant</a>
             </nav>
 
             <div class="nav-actions">
@@ -519,6 +520,54 @@
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Dedicated AI Chatbot Page -->
+        <section id="chatbot" style="display: none; padding: 120px 20px 80px;">
+            <div class="container" style="max-width: 800px; margin: 0 auto;">
+                <div class="section-header reveal active" style="text-align: center; margin-bottom: 40px;">
+                    <span class="sub-title">Ayssh Cafe Assistant</span>
+                    <h2 class="section-title">Chat with our AI Host</h2>
+                    <p style="color: var(--text-muted); font-size: 0.95rem; margin-top: 10px;">
+                        Have questions about our menus, reservation timings, specials, or directions? Ask our premium AI chatbot helper!
+                    </p>
+                </div>
+
+                <div class="page-chat-container">
+                    <div class="page-chat-header">
+                        <div class="page-chat-info">
+                            <div class="page-chat-status-dot"></div>
+                            <div>
+                                <h3 style="font-family: var(--font-heading); color: var(--text-primary); font-size: 1.1rem; font-weight: 700; margin: 0;">Ayssh Cafe AI Host</h3>
+                                <span style="font-size: 0.75rem; color: var(--primary); font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase;">Powered by Groq LPU</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="page-chat-feed" id="pageChatFeed">
+                        <!-- Welcoming messages -->
+                        <div class="page-chat-msg bot">
+                            <div class="page-chat-bubble">
+                                Hi there! Welcome to Ayssh Cafe. ☕ How can I help you today?
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="page-chat-prompts">
+                        <button class="page-prompt-chip" data-prompt="timings">🕒 Hours</button>
+                        <button class="page-prompt-chip" data-prompt="location">📍 Location</button>
+                        <button class="page-prompt-chip" data-prompt="book">📅 Book Table</button>
+                        <button class="page-prompt-chip" data-prompt="specials">✨ Specials</button>
+                    </div>
+
+                    <form id="pageChatForm" class="page-chat-input-area">
+                        <input type="text" id="pageChatInput" placeholder="Ask anything about Ayssh Cafe..." autocomplete="off" required>
+                        <button type="submit" class="page-chat-send-btn">
+                            Send <i class="fa-solid fa-paper-plane" style="margin-left: 6px;"></i>
+                        </button>
+                    </form>
                 </div>
             </div>
         </section>
