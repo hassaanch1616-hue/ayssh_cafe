@@ -921,7 +921,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // Process Bot message with simulated typing delay (or Groq LPU API)
     const processBotReply = async (userText) => {
         const indicator = showTypingIndicator();
-        const apiKey = localStorage.getItem('ayssh_groq_api_key');
+        
+        // Hardcode your Groq API Key here (starts with gsk_...) so the chatbot works for all online visitors.
+        // WARNING: Since this is a static site, this key will be visible in the browser source code.
+        const HARDCODED_API_KEY = ""; 
+        const apiKey = localStorage.getItem('ayssh_groq_api_key') || HARDCODED_API_KEY;
 
         if (apiKey) {
             try {
