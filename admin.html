@@ -1,0 +1,1425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Portal - Ayssh Cafe</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-primary: #06100D;       /* Deep obsidian green */
+            --bg-secondary: #0D1C18;     /* Dark emerald green */
+            --bg-tertiary: #142923;      /* Medium emerald green */
+            --primary: #C9A054;          /* Champagne Gold */
+            --primary-hover: #B88F43;    /* Darker gold hover */
+            --primary-glow: rgba(201, 160, 84, 0.3);
+            --accent: #EAD2AC;           /* Soft silk cream */
+            --text-primary: #F2EFE9;     /* Ivory text */
+            --text-secondary: #9EB5AE;   /* Muted sage green */
+            --text-muted: #688079;       /* Slate green */
+            --border-color: rgba(201, 160, 84, 0.15);
+            --border-hover: rgba(201, 160, 84, 0.35);
+            --glass-bg: rgba(13, 28, 24, 0.85);
+            --glass-border: rgba(201, 160, 84, 0.2);
+            --shadow-sm: 0 4px 10px rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.5);
+            
+            --font-heading: 'Playfair Display', serif;
+            --font-body: 'Plus Jakarta Sans', sans-serif;
+            --transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+            --border-radius-sm: 8px;
+            --border-radius-md: 16px;
+            --border-radius-lg: 24px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- LOGIN PAGE STYLE --- */
+        .login-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+            padding: 20px;
+        }
+
+        .login-card {
+            background-color: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            padding: 40px;
+            border-radius: var(--border-radius-lg);
+            width: 100%;
+            max-width: 450px;
+            box-shadow: var(--shadow-md);
+            backdrop-filter: blur(15px);
+            text-align: center;
+            animation: fadeInUp 0.6s ease;
+        }
+
+        .login-logo {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+
+        .login-logo svg {
+            filter: drop-shadow(0 0 8px var(--primary-glow));
+        }
+
+        .login-logo-text {
+            font-family: var(--font-heading);
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--text-primary) 30%, var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .login-logo-text span {
+            color: var(--primary);
+            -webkit-text-fill-color: initial;
+        }
+
+        .login-card h2 {
+            font-family: var(--font-heading);
+            font-size: 1.6rem;
+            margin-bottom: 24px;
+            color: var(--primary);
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            text-align: left;
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        .form-group input {
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 12px 18px;
+            border-radius: var(--border-radius-sm);
+            font-family: var(--font-body);
+            transition: var(--transition);
+            font-size: 1rem;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 10px var(--primary-glow);
+        }
+
+        .btn {
+            background-color: var(--primary);
+            color: #14100D;
+            border: none;
+            padding: 14px 24px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: var(--transition);
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 4px 15px rgba(201, 160, 84, 0.25);
+        }
+
+        .btn:hover {
+            background-color: var(--primary-hover);
+            box-shadow: 0 4px 20px rgba(201, 160, 84, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .error-message {
+            color: #e63946;
+            font-size: 0.85rem;
+            margin-top: 12px;
+            display: none;
+        }
+
+        /* --- DASHBOARD LAYOUT STYLE --- */
+        .dashboard-container {
+            display: none; /* Shown after auth */
+            flex: 1;
+            flex-direction: column;
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px;
+        }
+
+        /* Header Navbar */
+        .admin-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-bottom: 24px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 30px;
+        }
+
+        .admin-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .admin-brand span {
+            font-family: var(--font-heading);
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--text-primary) 30%, var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .admin-brand .logo-accent {
+            color: var(--primary);
+            -webkit-text-fill-color: initial;
+        }
+
+        .admin-badge {
+            background: rgba(201, 160, 84, 0.08);
+            border: 1px solid rgba(201, 160, 84, 0.2);
+            color: var(--primary);
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .user-nav {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logout-btn {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 8px 16px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .logout-btn:hover {
+            color: #e63946;
+            border-color: #e63946;
+            background: rgba(230, 57, 70, 0.05);
+        }
+
+        /* KPI Cards Grid */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        .kpi-card {
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            padding: 24px;
+            border-radius: var(--border-radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: var(--transition);
+        }
+
+        .kpi-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-4px);
+            box-shadow: 0 4px 15px rgba(201, 160, 84, 0.1);
+        }
+
+        .kpi-details h3 {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .kpi-details p {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--primary);
+            font-family: var(--font-heading);
+        }
+
+        .kpi-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            color: var(--primary);
+        }
+
+        /* Tab Controls */
+        .tab-menu {
+            display: flex;
+            gap: 10px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 30px;
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            padding: 12px 24px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            position: relative;
+            transition: var(--transition);
+        }
+
+        .tab-btn:hover {
+            color: var(--text-primary);
+        }
+
+        .tab-btn.active {
+            color: var(--primary);
+        }
+
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: var(--primary);
+            border-radius: 3px 3px 0 0;
+        }
+
+        /* Tab Content Panels */
+        .tab-panel {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .tab-panel.active {
+            display: block;
+        }
+
+        /* Tables & Content Cards */
+        .content-card {
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-md);
+            padding: 30px;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .panel-header h2 {
+            font-family: var(--font-heading);
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th {
+            background-color: var(--bg-tertiary);
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 14px 18px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        td {
+            padding: 16px 18px;
+            border-bottom: 1px solid rgba(201, 160, 84, 0.05);
+            font-size: 0.95rem;
+            vertical-align: middle;
+        }
+
+        tr:hover td {
+            background-color: rgba(201, 160, 84, 0.02);
+        }
+
+        /* Badges & Statuses */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 10px;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .status-badge.processing {
+            background-color: rgba(201, 160, 84, 0.1);
+            color: var(--primary);
+            border: 1px solid rgba(201, 160, 84, 0.2);
+        }
+
+        .status-badge.preparing {
+            background-color: rgba(243, 229, 171, 0.1);
+            color: #f3e5ab;
+            border: 1px solid rgba(243, 229, 171, 0.2);
+        }
+
+        .status-badge.dispatching {
+            background-color: rgba(27, 59, 50, 0.2);
+            color: #52b788;
+            border: 1px solid rgba(82, 183, 136, 0.3);
+        }
+
+        .status-badge.completed {
+            background-color: rgba(0, 150, 136, 0.15);
+            color: #4db6ac;
+            border: 1px solid rgba(77, 182, 172, 0.3);
+        }
+
+        /* Order items layout list */
+        .order-items-list {
+            list-style: none;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .order-items-list li {
+            margin-bottom: 4px;
+        }
+
+        /* Interactive Inputs in Table */
+        .status-select {
+            background-color: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-family: var(--font-body);
+            font-size: 0.85rem;
+            outline: none;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .status-select:focus {
+            border-color: var(--primary);
+        }
+
+        .action-icon-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: var(--transition);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .action-icon-btn:hover {
+            background-color: rgba(230, 57, 70, 0.1);
+            color: #e63946;
+        }
+
+        /* Menu Prices Editor Styles */
+        .price-input-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            max-width: 150px;
+        }
+
+        .price-input-group span {
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        .price-input {
+            width: 80px;
+            background-color: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 6px 10px;
+            border-radius: 4px;
+            font-family: var(--font-body);
+            font-size: 0.9rem;
+            text-align: center;
+            outline: none;
+            transition: var(--transition);
+        }
+
+        .price-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 5px var(--primary-glow);
+        }
+
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background-color: var(--bg-tertiary);
+            border: 1px solid var(--primary);
+            color: var(--text-primary);
+            padding: 12px 30px;
+            border-radius: 50px;
+            box-shadow: var(--shadow-md), var(--shadow-glow);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            opacity: 0;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s ease;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        .toast i {
+            color: var(--primary);
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ==================== AUTHENTICATION WRAPPER ==================== -->
+    <div class="login-container" id="authContainer">
+        
+        <!-- 1. Setup Admin Account Card -->
+        <div class="login-card" id="setupCard" style="display: none;">
+            <div class="login-logo">
+                <svg viewBox="0 0 100 100" width="44" height="44">
+                    <path d="M30,42 h40 c4,0 8,3 8,8 v8 c0,9 -7,16 -16,16 h-16 c-9,0 -16,-7 -16,-16 v-8 C22,45 26,42 30,42 z" fill="none" stroke="var(--primary)" stroke-width="5" stroke-linecap="round"/>
+                    <path d="M70,49 c3,0 6,3 6,6 v1 c0,3 -3,6 -6,6" fill="none" stroke="var(--primary)" stroke-width="5" stroke-linecap="round"/>
+                    <path d="M22,80 h56" fill="none" stroke="var(--primary)" stroke-width="5" stroke-linecap="round"/>
+                </svg>
+                <div class="login-logo-text"><span>Ayssh</span> Cafe</div>
+            </div>
+            <h2 style="margin-bottom: 8px;">Create Admin Account</h2>
+            <p style="color: var(--text-secondary); font-size: 0.82rem; margin-bottom: 20px;">Set up your secure, personal local administrator credentials. Your password will be encrypted using industrial SHA-256 hashing inside your local browser storage.</p>
+            <form id="setupForm">
+                <div class="form-group">
+                    <label for="setupUsername">Create Username</label>
+                    <input type="text" id="setupUsername" placeholder="e.g. admin" required autocomplete="username">
+                </div>
+                <div class="form-group">
+                    <label for="setupPassword">Create Password</label>
+                    <input type="password" id="setupPassword" placeholder="••••••••" required autocomplete="new-password">
+                </div>
+                <div class="form-group">
+                    <label for="setupConfirmPassword">Confirm Password</label>
+                    <input type="password" id="setupConfirmPassword" placeholder="••••••••" required autocomplete="new-password">
+                </div>
+                <div class="form-group">
+                    <label for="setupQuestion">Security Recovery Question</label>
+                    <select id="setupQuestion" style="background-color: var(--bg-secondary); border: 1px solid var(--border-color); color: var(--text-primary); padding: 12px; border-radius: var(--border-radius-sm); font-family: var(--font-body); font-size: 0.9rem; width: 100%; outline: none; transition: var(--transition);">
+                        <option value="First pet name">What was the name of your first pet?</option>
+                        <option value="Sixth grade school">What school did you attend for sixth grade?</option>
+                        <option value="Parents meeting city">In what city or town did your parents meet?</option>
+                        <option value="First car model">What was the make and model of your first car?</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="setupAnswer">Your Security Answer</label>
+                    <input type="text" id="setupAnswer" placeholder="Answer is case-insensitive" required>
+                </div>
+                <button type="submit" class="btn">Register & Log In <i class="fa-solid fa-user-plus"></i></button>
+                <div class="error-message" id="setupError">Passwords do not match!</div>
+            </form>
+        </div>
+
+        <!-- 2. Admin Log In Card -->
+        <div class="login-card" id="loginCard" style="display: none;">
+            <div class="login-logo">
+                <svg viewBox="0 0 100 100" width="44" height="44">
+                    <path d="M30,42 h40 c4,0 8,3 8,8 v8 c0,9 -7,16 -16,16 h-16 c-9,0 -16,-7 -16,-16 v-8 C22,45 26,42 30,42 z" fill="none" stroke="var(--primary)" stroke-width="5" stroke-linecap="round"/>
+                    <path d="M70,49 c3,0 6,3 6,6 v1 c0,3 -3,6 -6,6" fill="none" stroke="var(--primary)" stroke-width="5" stroke-linecap="round"/>
+                    <path d="M22,80 h56" fill="none" stroke="var(--primary)" stroke-width="5" stroke-linecap="round"/>
+                </svg>
+                <div class="login-logo-text"><span>Ayssh</span> Cafe</div>
+            </div>
+            <h2>Admin Portal Access</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="loginUsername">Username</label>
+                    <input type="text" id="loginUsername" placeholder="Enter Username" required autocomplete="username">
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <input type="password" id="loginPassword" placeholder="••••••••" required autocomplete="current-password">
+                </div>
+                <button type="submit" class="btn">Log In <i class="fa-solid fa-right-to-bracket"></i></button>
+                <div class="error-message" id="loginError">Incorrect username or password!</div>
+                <div style="margin-top: 20px;">
+                    <a href="#" id="forgotPasswordLink" style="color: var(--primary); font-size: 0.85rem; text-decoration: none; font-weight: 600; border-bottom: 1px dashed var(--primary); padding-bottom: 2px;">Forgot Password?</a>
+                </div>
+            </form>
+        </div>
+
+        <!-- 3. Password Recovery Card -->
+        <div class="login-card" id="recoveryCard" style="display: none;">
+            <div class="login-logo">
+                <svg viewBox="0 0 100 100" width="44" height="44">
+                    <path d="M30,42 h40 c4,0 8,3 8,8 v8 c0,9 -7,16 -16,16 h-16 c-9,0 -16,-7 -16,-16 v-8 C22,45 26,42 30,42 z" fill="none" stroke="var(--primary)" stroke-width="5" stroke-linecap="round"/>
+                    <path d="M70,49 c3,0 6,3 6,6 v1 c0,3 -3,6 -6,6" fill="none" stroke="var(--primary)" stroke-width="5" stroke-linecap="round"/>
+                    <path d="M22,80 h56" fill="none" stroke="var(--primary)" stroke-width="5" stroke-linecap="round"/>
+                </svg>
+                <div class="login-logo-text"><span>Ayssh</span> Cafe</div>
+            </div>
+            <h2 style="margin-bottom: 8px;">Reset Password</h2>
+            <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 24px;" id="recoveryQuestionLabel">Security question will load here...</p>
+            
+            <!-- Step A: Verify Answer -->
+            <form id="recoveryForm">
+                <div class="form-group">
+                    <label for="recoveryAnswer">Your Answer</label>
+                    <input type="text" id="recoveryAnswer" placeholder="Type answer here" required>
+                </div>
+                <button type="submit" class="btn">Verify Answer <i class="fa-solid fa-key"></i></button>
+                <div class="error-message" id="recoveryError">Incorrect answer! Security answer verification failed.</div>
+                <div style="margin-top: 20px;">
+                    <a href="#" id="backToLoginLink" style="color: var(--text-secondary); font-size: 0.85rem; text-decoration: none; font-weight: 600;">Back to Login</a>
+                </div>
+            </form>
+
+            <!-- Step B: Enter New Password (hidden initially) -->
+            <form id="resetPasswordForm" style="display: none;">
+                <div class="form-group">
+                    <label for="newPassword">New Password</label>
+                    <input type="password" id="newPassword" placeholder="••••••••" required autocomplete="new-password">
+                </div>
+                <div class="form-group">
+                    <label for="confirmNewPassword">Confirm New Password</label>
+                    <input type="password" id="confirmNewPassword" placeholder="••••••••" required autocomplete="new-password">
+                </div>
+                <button type="submit" class="btn">Update Password <i class="fa-solid fa-lock-open"></i></button>
+                <div class="error-message" id="resetError">Passwords do not match!</div>
+            </form>
+        </div>
+
+    </div>
+
+    <!-- ==================== DASHBOARD PANEL ==================== -->
+    <div class="dashboard-container" id="dashboardContainer">
+        
+        <!-- Navbar -->
+        <header class="admin-header">
+            <div class="admin-brand">
+                <span><span class="logo-accent">Ayssh</span> Cafe</span>
+                <span class="admin-badge">Admin Dashboard</span>
+            </div>
+            <div class="user-nav">
+                <span>Welcome, Operator</span>
+                <button class="logout-btn" id="resetDbBtn" style="color: #e63946; border-color: rgba(230, 57, 70, 0.3); margin-right: 8px;">Reset System <i class="fa-solid fa-arrow-rotate-left"></i></button>
+                <button class="logout-btn" id="logoutBtn">Log Out <i class="fa-solid fa-right-from-bracket"></i></button>
+            </div>
+        </header>
+
+        <!-- KPI Grid -->
+        <section class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-details">
+                    <h3>Total Sales</h3>
+                    <p id="kpiTotalSales">Rs. 0</p>
+                </div>
+                <div class="kpi-icon"><i class="fa-solid fa-money-bill-wave"></i></div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-details">
+                    <h3>Orders Logged</h3>
+                    <p id="kpiTotalOrders">0</p>
+                </div>
+                <div class="kpi-icon"><i class="fa-solid fa-receipt"></i></div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-details">
+                    <h3>Table Bookings</h3>
+                    <p id="kpiTotalBookings">0</p>
+                </div>
+                <div class="kpi-icon"><i class="fa-solid fa-calendar-check"></i></div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-details">
+                    <h3>Active Catalog</h3>
+                    <p>9 Items</p>
+                </div>
+                <div class="kpi-icon"><i class="fa-solid fa-mug-hot"></i></div>
+            </div>
+        </section>
+
+        <!-- Tab List Menu -->
+        <nav class="tab-menu">
+            <button class="tab-btn active" data-tab="ordersTab">Orders Panel</button>
+            <button class="tab-btn" data-tab="bookingsTab">Bookings Panel</button>
+            <button class="tab-btn" data-tab="menuTab">Menu Price Sync</button>
+            <button class="tab-btn" data-tab="chatbotTab">AI Bot Configuration</button>
+        </nav>
+
+        <!-- Tab 1: Orders -->
+        <div class="tab-panel active" id="ordersTab">
+            <div class="content-card">
+                <div class="panel-header">
+                    <h2>Customer Orders Queue</h2>
+                </div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Phone</th>
+                                <th>Delivery Type</th>
+                                <th>Items Ordered</th>
+                                <th>Total Bill</th>
+                                <th>Order Status</th>
+                                <th>Order Date</th>
+                                <th style="text-align: center;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ordersTableBody">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 2: Bookings -->
+        <div class="tab-panel" id="bookingsTab">
+            <div class="content-card">
+                <div class="panel-header">
+                    <h2>Reserved Tables Log</h2>
+                </div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Booking ID</th>
+                                <th>Guest Name</th>
+                                <th>Party Size</th>
+                                <th>Table Layout</th>
+                                <th>Reserve Date</th>
+                                <th>Time Slot</th>
+                                <th>Registered</th>
+                                <th style="text-align: center;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bookingsTableBody">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 3: Menu Price Adjuster -->
+        <div class="tab-panel" id="menuTab">
+            <div class="content-card">
+                <div class="panel-header">
+                    <h2>Storefront Menu Price Manager</h2>
+                </div>
+                <div class="table-responsive" style="margin-bottom: 24px;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Catalog ID</th>
+                                <th>Category</th>
+                                <th>Item Title</th>
+                                <th>Base Price</th>
+                                <th>Adjusted Store Price</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td>Coffee & Aromatic Tea</td>
+                                <td>Premium Cappuccino</td>
+                                <td>Rs. 450</td>
+                                <td>
+                                    <div class="price-input-group">
+                                        <span>Rs.</span>
+                                        <input type="number" class="price-input" data-menu-id="1" value="450">
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td>Coffee & Aromatic Tea</td>
+                                <td>Traditional Karak Chai</td>
+                                <td>Rs. 250</td>
+                                <td>
+                                    <div class="price-input-group">
+                                        <span>Rs.</span>
+                                        <input type="number" class="price-input" data-menu-id="2" value="250">
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>3</td>
+                                <td>Coffee & Aromatic Tea</td>
+                                <td>Caramel Macchiato</td>
+                                <td>Rs. 550</td>
+                                <td>
+                                    <div class="price-input-group">
+                                        <span>Rs.</span>
+                                        <input type="number" class="price-input" data-menu-id="3" value="550">
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>4</td>
+                                <td>Decadent Cakes</td>
+                                <td>Chocolate Fudge Truffle</td>
+                                <td>Rs. 950</td>
+                                <td>
+                                    <div class="price-input-group">
+                                        <span>Rs.</span>
+                                        <input type="number" class="price-input" data-menu-id="4" value="950">
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>5</td>
+                                <td>Decadent Cakes</td>
+                                <td>Velvet Rose Cake</td>
+                                <td>Rs. 1200</td>
+                                <td>
+                                    <div class="price-input-group">
+                                        <span>Rs.</span>
+                                        <input type="number" class="price-input" data-menu-id="5" value="1200">
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>6</td>
+                                <td>Decadent Cakes</td>
+                                <td>Lemon Drizzle Cake</td>
+                                <td>Rs. 850</td>
+                                <td>
+                                    <div class="price-input-group">
+                                        <span>Rs.</span>
+                                        <input type="number" class="price-input" data-menu-id="6" value="850">
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>7</td>
+                                <td>Artisanal Cookies</td>
+                                <td>Choco-Chip Giant Cookie</td>
+                                <td>Rs. 180</td>
+                                <td>
+                                    <div class="price-input-group">
+                                        <span>Rs.</span>
+                                        <input type="number" class="price-input" data-menu-id="7" value="180">
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>8</td>
+                                <td>Artisanal Cookies</td>
+                                <td>Butter Almond Biscotti</td>
+                                <td>Rs. 220</td>
+                                <td>
+                                    <div class="price-input-group">
+                                        <span>Rs.</span>
+                                        <input type="number" class="price-input" data-menu-id="8" value="220">
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>9</td>
+                                <td>Artisanal Cookies</td>
+                                <td>Coconut Crunch Biscuits</td>
+                                <td>Rs. 150</td>
+                                <td>
+                                    <div class="price-input-group">
+                                        <span>Rs.</span>
+                                        <input type="number" class="price-input" data-menu-id="9" value="150">
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <button class="btn" id="savePricesBtn" style="width: auto; padding: 14px 40px;"><i class="fa-solid fa-floppy-disk"></i> Apply Menu Adjustments</button>
+            </div>
+        </div>
+
+        <!-- Tab 4: AI Bot Configuration -->
+        <div class="tab-panel" id="chatbotTab">
+            <div class="content-card">
+                <div class="panel-header">
+                    <h2>Groq AI Settings</h2>
+                </div>
+                <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 24px; max-width: 800px; line-height: 1.5;">
+                    Connect Ayssh Cafe's storefront chatbot directly to Groq's official LPU models. When enabled, your visitors can chat with a real, smart AI host powered by Groq that knows the cafe's hours, location, and menus.
+                </p>
+                <div class="form-group" style="max-width: 600px; margin-bottom: 24px;">
+                    <label for="groqApiKey">Groq API Key</label>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="password" id="groqApiKey" placeholder="Enter your Groq API Key (starts with gsk_)" style="flex: 1;">
+                        <button class="btn" id="testApiKeyBtn" style="width: auto; padding: 0 20px; font-size: 0.85rem; border-radius: var(--border-radius-sm);"><i class="fa-solid fa-vial"></i> Test Key</button>
+                    </div>
+                    <span style="font-size: 0.75rem; color: var(--text-muted); margin-top: 6px; display: block;">
+                        Your key is stored strictly inside your browser's local sandbox and never uploaded to any server. Get a free API Key at <a href="https://console.groq.com/" target="_blank" style="color: var(--primary); text-decoration: underline;">Groq Console Portal</a>.
+                    </span>
+                </div>
+                <div style="display: flex; gap: 12px;">
+                    <button class="btn" id="saveApiKeyBtn" style="width: auto; padding: 14px 40px;"><i class="fa-solid fa-floppy-disk"></i> Save Configuration</button>
+                    <button class="btn" id="clearApiKeyBtn" style="width: auto; padding: 14px 24px; background-color: transparent; border: 1px solid var(--border-color); color: var(--text-primary);"><i class="fa-solid fa-trash-can"></i> Clear Key</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Notification Toast -->
+    <div class="toast" id="adminToast">
+        <i class="fa-solid fa-circle-check"></i>
+        <span id="toastMessage">Menu Prices updated successfully!</span>
+    </div>
+
+    <!-- ==================== JAVASCRIPT CONTROL ==================== -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // --- CRYPTOGRAPHIC SHA-256 HASHING ---
+            const hashPassword = async (password) => {
+                const encoder = new TextEncoder();
+                const data = encoder.encode(password.trim().toLowerCase());
+                const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+                const hashArray = Array.from(new Uint8Array(hashBuffer));
+                return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+            };
+
+            // --- AUTHENTICATION SHIELD & SETUP WIZARD ---
+            const authContainer = document.getElementById('authContainer');
+            const setupCard = document.getElementById('setupCard');
+            const loginCard = document.getElementById('loginCard');
+            const recoveryCard = document.getElementById('recoveryCard');
+            const dashboardContainer = document.getElementById('dashboardContainer');
+
+            const setupForm = document.getElementById('setupForm');
+            const loginForm = document.getElementById('loginForm');
+            const recoveryForm = document.getElementById('recoveryForm');
+            const resetPasswordForm = document.getElementById('resetPasswordForm');
+
+            const loginError = document.getElementById('loginError');
+            const setupError = document.getElementById('setupError');
+            const recoveryError = document.getElementById('recoveryError');
+            const resetError = document.getElementById('resetError');
+
+            const checkAuth = () => {
+                const isLogged = sessionStorage.getItem('ayssh_admin_logged') === 'true';
+                const hasAccount = localStorage.getItem('ayssh_admin_username') !== null;
+
+                if (isLogged) {
+                    authContainer.style.display = 'none';
+                    dashboardContainer.style.display = 'flex';
+                    renderAllData();
+                } else {
+                    authContainer.style.display = 'flex';
+                    dashboardContainer.style.display = 'none';
+                    
+                    // Hide all cards first
+                    setupCard.style.display = 'none';
+                    loginCard.style.display = 'none';
+                    recoveryCard.style.display = 'none';
+
+                    if (!hasAccount) {
+                        setupCard.style.display = 'block';
+                    } else {
+                        loginCard.style.display = 'block';
+                    }
+                }
+            };
+
+            // Setup Form Submission (Hashed registration)
+            setupForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const username = document.getElementById('setupUsername').value.trim();
+                const pass = document.getElementById('setupPassword').value;
+                const confirmPass = document.getElementById('setupConfirmPassword').value;
+                const question = document.getElementById('setupQuestion').value;
+                const answer = document.getElementById('setupAnswer').value;
+
+                if (pass !== confirmPass) {
+                    setupError.style.display = 'block';
+                    return;
+                }
+                setupError.style.display = 'none';
+
+                // Hash password and answer securely
+                const passwordHash = await hashPassword(pass);
+                const answerHash = await hashPassword(answer);
+
+                localStorage.setItem('ayssh_admin_username', username);
+                localStorage.setItem('ayssh_admin_hash', passwordHash);
+                localStorage.setItem('ayssh_admin_question', question);
+                localStorage.setItem('ayssh_admin_answer_hash', answerHash);
+
+                sessionStorage.setItem('ayssh_admin_logged', 'true');
+                setupForm.reset();
+                showToast('Administrator Account successfully created!');
+                checkAuth();
+            });
+
+            // Login Form Submission
+            loginForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const inputUser = document.getElementById('loginUsername').value.trim();
+                const inputPass = document.getElementById('loginPassword').value;
+
+                const storedUser = localStorage.getItem('ayssh_admin_username');
+                const storedHash = localStorage.getItem('ayssh_admin_hash');
+
+                const inputHash = await hashPassword(inputPass);
+
+                if (inputUser === storedUser && inputHash === storedHash) {
+                    sessionStorage.setItem('ayssh_admin_logged', 'true');
+                    loginError.style.display = 'none';
+                    loginForm.reset();
+                    checkAuth();
+                } else {
+                    loginError.style.display = 'block';
+                }
+            });
+
+            // Forgot Password Transition
+            document.getElementById('forgotPasswordLink').addEventListener('click', (e) => {
+                e.preventDefault();
+                loginCard.style.display = 'none';
+                recoveryCard.style.display = 'block';
+                
+                const question = localStorage.getItem('ayssh_admin_question') || 'What was the name of your first pet?';
+                document.getElementById('recoveryQuestionLabel').textContent = `Security Question: "${question}"`;
+                recoveryForm.style.display = 'block';
+                resetPasswordForm.style.display = 'none';
+            });
+
+            // Return to login from recovery
+            document.getElementById('backToLoginLink').addEventListener('click', (e) => {
+                e.preventDefault();
+                checkAuth();
+            });
+
+            // Recovery Answer Verification
+            recoveryForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const inputAnswer = document.getElementById('recoveryAnswer').value;
+                const storedAnswerHash = localStorage.getItem('ayssh_admin_answer_hash');
+                const inputAnswerHash = await hashPassword(inputAnswer);
+
+                if (inputAnswerHash === storedAnswerHash) {
+                    recoveryError.style.display = 'none';
+                    recoveryForm.style.display = 'none';
+                    resetPasswordForm.style.display = 'block';
+                    recoveryForm.reset();
+                } else {
+                    recoveryError.style.display = 'block';
+                }
+            });
+
+            // Password Reset Form Submission
+            resetPasswordForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const newPass = document.getElementById('newPassword').value;
+                const confirmNewPass = document.getElementById('confirmNewPassword').value;
+
+                if (newPass !== confirmNewPass) {
+                    resetError.style.display = 'block';
+                    return;
+                }
+                resetError.style.display = 'none';
+
+                const newPasswordHash = await hashPassword(newPass);
+                localStorage.setItem('ayssh_admin_hash', newPasswordHash);
+
+                resetPasswordForm.reset();
+                showToast('Password successfully reset! Please log in.');
+                checkAuth();
+            });
+
+            document.getElementById('resetDbBtn').addEventListener('click', () => {
+                if (confirm('Are you sure you want to clear all orders, bookings, and reset counters to 0? This cannot be undone.')) {
+                    localStorage.removeItem('ayssh_orders');
+                    localStorage.removeItem('ayssh_bookings');
+                    localStorage.setItem('ayssh_order_counter', '0');
+                    localStorage.setItem('ayssh_booking_counter', '0');
+                    showToast('System reset complete!');
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1000);
+                }
+            });
+
+            document.getElementById('logoutBtn').addEventListener('click', () => {
+                sessionStorage.removeItem('ayssh_admin_logged');
+                checkAuth();
+            });
+
+            // --- TAB SELECTORS ---
+            const tabButtons = document.querySelectorAll('.tab-btn');
+            const tabPanels = document.querySelectorAll('.tab-panel');
+
+            tabButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    tabButtons.forEach(b => b.classList.remove('active'));
+                    tabPanels.forEach(p => p.classList.remove('active'));
+
+                    btn.classList.add('active');
+                    const tabId = btn.getAttribute('data-tab');
+                    document.getElementById(tabId).classList.add('active');
+                });
+            });
+
+            // --- RENDER TABLES & METRICS ---
+            const renderAllData = () => {
+                renderKPIs();
+                renderOrdersTable();
+                renderBookingsTable();
+                loadPriceInputs();
+            };
+
+            // 1. KPI cards calculation
+            const renderKPIs = () => {
+                const orders = JSON.parse(localStorage.getItem('ayssh_orders') || '[]');
+                const bookings = JSON.parse(localStorage.getItem('ayssh_bookings') || '[]');
+
+                // Total Sales
+                const totalSales = orders.reduce((sum, ord) => sum + ord.total, 0);
+                document.getElementById('kpiTotalSales').textContent = `Rs. ${totalSales.toLocaleString()}`;
+                
+                // Total Orders
+                document.getElementById('kpiTotalOrders').textContent = orders.length;
+
+                // Bookings count
+                document.getElementById('kpiTotalBookings').textContent = bookings.length;
+            };
+
+            // 2. Orders Table
+            const renderOrdersTable = () => {
+                const orders = JSON.parse(localStorage.getItem('ayssh_orders') || '[]');
+                const tableBody = document.getElementById('ordersTableBody');
+                
+                if (orders.length === 0) {
+                    tableBody.innerHTML = `<tr><td colspan="8" style="text-align:center; color: var(--text-muted);">No orders placed yet.</td></tr>`;
+                    return;
+                }
+
+                // Sort by date descending
+                orders.sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+                let rowsHTML = '';
+                orders.forEach((ord, index) => {
+                    // Item details list
+                    let itemsHTML = '<ul class="order-items-list">';
+                    ord.items.forEach(it => {
+                        itemsHTML += `<li>• ${it.name} (x${it.quantity})</li>`;
+                    });
+                    itemsHTML += '</ul>';
+
+                    // Order status selector
+                    const statusClass = ord.status.toLowerCase();
+                    const dateStr = new Date(ord.timestamp).toLocaleDateString('en-US', {
+                        month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit'
+                    });
+
+                    rowsHTML += `
+                        <tr>
+                            <td style="font-weight: 700; color: var(--primary);">${ord.id}</td>
+                            <td>${ord.phone}</td>
+                            <td>${ord.deliveryType}</td>
+                            <td>${itemsHTML}</td>
+                            <td style="font-weight: 700;">Rs. ${ord.total.toLocaleString()}</td>
+                            <td>
+                                <select class="status-select" onchange="updateOrderStatus('${ord.id}', this.value)">
+                                    <option value="Processing" ${ord.status === 'Processing' ? 'selected' : ''}>Processing</option>
+                                    <option value="Preparing" ${ord.status === 'Preparing' ? 'selected' : ''}>Preparing</option>
+                                    <option value="Dispatching" ${ord.status === 'Dispatching' ? 'selected' : ''}>Dispatching</option>
+                                    <option value="Completed" ${ord.status === 'Completed' ? 'selected' : ''}>Completed</option>
+                                </select>
+                            </td>
+                            <td style="font-size:0.85rem; color: var(--text-secondary);">${dateStr}</td>
+                            <td style="text-align: center;">
+                                <button class="action-icon-btn" onclick="deleteOrder('${ord.id}')" title="Delete Order">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                tableBody.innerHTML = rowsHTML;
+            };
+
+            // 3. Bookings Table
+            const renderBookingsTable = () => {
+                const bookings = JSON.parse(localStorage.getItem('ayssh_bookings') || '[]');
+                const tableBody = document.getElementById('bookingsTableBody');
+
+                if (bookings.length === 0) {
+                    tableBody.innerHTML = `<tr><td colspan="8" style="text-align:center; color: var(--text-muted);">No reservations booked yet.</td></tr>`;
+                    return;
+                }
+
+                // Sort by date descending
+                bookings.sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+                let rowsHTML = '';
+                bookings.forEach(bk => {
+                    const registerDate = new Date(bk.timestamp).toLocaleDateString('en-US', {
+                        month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit'
+                    });
+
+                    rowsHTML += `
+                        <tr>
+                            <td style="font-weight: 700; color: var(--primary);">${bk.id}</td>
+                            <td style="font-weight: 600;">${bk.name}</td>
+                            <td>${bk.guests}</td>
+                            <td>${bk.table}</td>
+                            <td>${bk.date}</td>
+                            <td>${bk.time}</td>
+                            <td style="font-size:0.85rem; color: var(--text-secondary);">${registerDate}</td>
+                            <td style="text-align: center;">
+                                <button class="action-icon-btn" onclick="deleteBooking('${bk.id}')" title="Cancel Booking">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                tableBody.innerHTML = rowsHTML;
+            };
+
+            // 4. Load price adjuster inputs
+            const loadPriceInputs = () => {
+                const adjustments = JSON.parse(localStorage.getItem('ayssh_menu_adjustments') || '{}');
+                document.querySelectorAll('.price-input').forEach(input => {
+                    const id = input.getAttribute('data-menu-id');
+                    if (adjustments[id]) {
+                        input.value = adjustments[id];
+                    }
+                });
+            };
+
+            // --- UPDATE DATA ACTIONS ---
+            // Save modified prices to localStorage
+            document.getElementById('savePricesBtn').addEventListener('click', () => {
+                const adjustments = {};
+                document.querySelectorAll('.price-input').forEach(input => {
+                    const id = input.getAttribute('data-menu-id');
+                    const val = parseInt(input.value);
+                    if (val && val > 0) {
+                        adjustments[id] = val;
+                    }
+                });
+
+                localStorage.setItem('ayssh_menu_adjustments', JSON.stringify(adjustments));
+                showToast('Store Menu Prices successfully adjusted!');
+            });
+
+            // AI Bot Settings Actions (Groq)
+            const groqApiKeyInput = document.getElementById('groqApiKey');
+            const saveApiKeyBtn = document.getElementById('saveApiKeyBtn');
+            const clearApiKeyBtn = document.getElementById('clearApiKeyBtn');
+            const testApiKeyBtn = document.getElementById('testApiKeyBtn');
+
+            // Load saved key on render
+            const loadSavedApiKey = () => {
+                const savedKey = localStorage.getItem('ayssh_groq_api_key') || '';
+                groqApiKeyInput.value = savedKey;
+            };
+            loadSavedApiKey();
+
+            saveApiKeyBtn.addEventListener('click', () => {
+                const keyVal = groqApiKeyInput.value.trim();
+                if (keyVal) {
+                    localStorage.setItem('ayssh_groq_api_key', keyVal);
+                    showToast('Groq API Key successfully saved!');
+                } else {
+                    showToast('Please enter a valid key first.');
+                }
+            });
+
+            clearApiKeyBtn.addEventListener('click', () => {
+                localStorage.removeItem('ayssh_groq_api_key');
+                groqApiKeyInput.value = '';
+                showToast('Groq API Key cleared.');
+            });
+
+            testApiKeyBtn.addEventListener('click', async () => {
+                const keyVal = groqApiKeyInput.value.trim();
+                if (!keyVal) {
+                    alert('Please enter a key to test.');
+                    return;
+                }
+
+                testApiKeyBtn.disabled = true;
+                testApiKeyBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Testing...';
+
+                try {
+                    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+                        method: 'POST',
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${keyVal}`
+                        },
+                        body: JSON.stringify({
+                            messages: [{ role: 'user', content: 'Respond with exactly the word SUCCESS' }],
+                            model: 'llama-3.1-8b-instant'
+                        })
+                    });
+
+                    const data = await response.json();
+                    if (response.ok && data.choices && data.choices[0] && data.choices[0].message.content.trim().includes('SUCCESS')) {
+                        alert('Connection Successful! Groq API key is valid.');
+                    } else {
+                        const errMsg = data.error ? data.error.message : 'Invalid API response format.';
+                        alert('Connection Failed: ' + errMsg);
+                    }
+                } catch (err) {
+                    alert('Connection Failed: ' + err.message);
+                } finally {
+                    testApiKeyBtn.disabled = false;
+                    testApiKeyBtn.innerHTML = '<i class="fa-solid fa-vial"></i> Test Key';
+                }
+            });
+
+            // Update Order Status in localStorage
+            window.updateOrderStatus = (id, newStatus) => {
+                const orders = JSON.parse(localStorage.getItem('ayssh_orders') || '[]');
+                const ord = orders.find(o => o.id === id);
+                if (ord) {
+                    ord.status = newStatus;
+                    localStorage.setItem('ayssh_orders', JSON.stringify(orders));
+                    showToast(`Order ${id} status updated to ${newStatus}.`);
+                    renderKPIs();
+                }
+            };
+
+            // Delete Order from localStorage
+            window.deleteOrder = (id) => {
+                if (confirm(`Are you sure you want to delete order ${id}?`)) {
+                    let orders = JSON.parse(localStorage.getItem('ayssh_orders') || '[]');
+                    orders = orders.filter(o => o.id !== id);
+                    localStorage.setItem('ayssh_orders', JSON.stringify(orders));
+                    showToast(`Order ${id} deleted.`);
+                    renderAllData();
+                }
+            };
+
+            // Cancel/Delete Reservation from localStorage
+            window.deleteBooking = (id) => {
+                if (confirm(`Are you sure you want to cancel table reservation ${id}?`)) {
+                    let bookings = JSON.parse(localStorage.getItem('ayssh_bookings') || '[]');
+                    bookings = bookings.filter(b => b.id !== id);
+                    localStorage.setItem('ayssh_bookings', JSON.stringify(bookings));
+                    showToast(`Reservation ${id} successfully cancelled.`);
+                    renderAllData();
+                }
+            };
+
+            // Helper to show custom toast
+            const showToast = (message) => {
+                const toast = document.getElementById('adminToast');
+                document.getElementById('toastMessage').textContent = message;
+                toast.classList.add('show');
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                }, 3000);
+            };
+
+            // Initialize Auth Check
+            checkAuth();
+        });
+    </script>
+</body>
+</html>
