@@ -924,7 +924,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Hardcode your Groq API Key here (starts with gsk_...) so the chatbot works for all online visitors.
         // WARNING: Since this is a static site, this key will be visible in the browser source code.
-        const HARDCODED_API_KEY = ""; 
+        const HARDCODED_API_KEY = "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"; 
         const apiKey = localStorage.getItem('ayssh_groq_api_key') || HARDCODED_API_KEY;
 
         if (apiKey) {
