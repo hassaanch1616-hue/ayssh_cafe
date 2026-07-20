@@ -1,11 +1,86 @@
-// ==========================================
-// Cafe Ayssh - Web Application Logic
-// ==========================================
+/* ==========================================================================
+   Ayssh Cafe - Customer Storefront Application Logic
+   ========================================================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
-    // ---- FIREBASE CONFIGURATION & INITIALIZATION ----
-    // Set this config to synchronize data between devices in real-time.
-    // If not configured, the website automatically falls back to localStorage.
+
+    // --- MENU ITEMS CATALOG DATABASE ---
+    const MENU_ITEMS = [
+        { 
+            id: "1", 
+            title: "Premium Cappuccino", 
+            category: "Coffee & Tea", 
+            basePrice: 450, 
+            image: "assets/coffee.jpg", 
+            desc: "A velvety double espresso base blended with rich steamed milk and a dense layer of micro-foam, dusted with cinnamon." 
+        },
+        { 
+            id: "2", 
+            title: "Traditional Karak Chai", 
+            category: "Coffee & Tea", 
+            basePrice: 250, 
+            image: "assets/karak_chai.jpg", 
+            desc: "Freshly brewed strong black tea simmered with milk, cardamom, and saffron for a classic warming Desi experience." 
+        },
+        { 
+            id: "3", 
+            title: "Caramel Macchiato", 
+            category: "Coffee & Tea", 
+            basePrice: 550, 
+            image: "assets/caramel_macchiato.jpg", 
+            desc: "Freshly pulled espresso layered over sweet vanilla-infused steamed milk, finished with a luscious drizzle of buttery caramel sauce." 
+        },
+        { 
+            id: "4", 
+            title: "Chocolate Fudge Truffle", 
+            category: "Decadent Cakes", 
+            basePrice: 950, 
+            image: "assets/cake.jpg", 
+            desc: "Dense, moist layers of premium chocolate cake covered in velvety chocolate truffle ganache and sweet chocolate chips." 
+        },
+        { 
+            id: "5", 
+            title: "Velvet Rose Cake", 
+            category: "Decadent Cakes", 
+            basePrice: 1200, 
+            image: "assets/rose_cake.jpg", 
+            desc: "A sophisticated crimson sponge cake with layers of smooth vanilla cream cheese frosting, topped with aromatic edible rose petals." 
+        },
+        { 
+            id: "6", 
+            title: "Lemon Drizzle Cake", 
+            category: "Decadent Cakes", 
+            basePrice: 850, 
+            image: "assets/lemon_cake.jpg", 
+            desc: "Zesty lemon-infused sponge cake soaked in sweet organic lemon syrup, finished with a delicate crisp glaze drizzle." 
+        },
+        { 
+            id: "7", 
+            title: "Choco-Chip Giant Cookie", 
+            category: "Artisanal Cookies", 
+            basePrice: 180, 
+            image: "assets/cookies.jpg", 
+            desc: "Freshly baked massive, chewy cookie loaded with gooey Belgian semi-sweet dark chocolate chips and a hint of sea salt." 
+        },
+        { 
+            id: "8", 
+            title: "Butter Almond Biscotti", 
+            category: "Artisanal Cookies", 
+            basePrice: 220, 
+            image: "assets/almond_biscotti.jpg", 
+            desc: "Twice-baked premium Italian-style biscotti packed with roasted almonds and butter, perfect for dipping in your Karak Chai or coffee." 
+        },
+        { 
+            id: "9", 
+            title: "Coconut Crunch Biscuits", 
+            category: "Artisanal Cookies", 
+            basePrice: 150, 
+            image: "assets/coconut_biscuits.jpg", 
+            desc: "Crisp and delicate oven-baked biscuits loaded with sweet toasted shredded coconut and finished with granulated sugar." 
+        }
+    ];
+
+    // --- FIREBASE CONFIGURATION & INITIALIZATION ---
     const FIREBASE_CONFIG = {
         apiKey: "AIzaSyCRA1A9Qqse2xlpVLzNXFXzCbQ-3tfzP9Q",
         authDomain: "ayssh-cafe.firebaseapp.com",
@@ -24,1246 +99,737 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             firebase.initializeApp(FIREBASE_CONFIG);
             db = firebase.firestore();
-            console.log("Firebase Firestore initialized successfully.");
+            console.log("Firebase Firestore initialized on customer storefront.");
+
+            // Real-Time Listeners to sync status changes from Admin in real-time
+            db.collection('orders').onSnapshot(snapshot => {
+                const orders = [];
+                snapshot.forEach(doc => {
+                    orders.push(doc.data());
+                });
+                localStorage.setItem('ayssh_orders', JSON.stringify(orders));
+                refreshTrackingDashboard();
+            });
+
+            db.collection('bookings').onSnapshot(snapshot => {
+                const bookings = [];
+                snapshot.forEach(doc => {
+                    bookings.push(doc.data());
+                });
+                localStorage.setItem('ayssh_bookings', JSON.stringify(bookings));
+                refreshTrackingDashboard();
+            });
         } catch (err) {
-            console.error("Firebase Initialization Error:", err);
+            console.error("Firebase Front-end Initialization Error:", err);
         }
     } else {
-        console.log("Firebase not configured. Falling back to localStorage database.");
+        console.log("Firebase not configured. Operating in localStorage mode.");
     }
 
-    // ---- STATE MANAGEMENT ----
-    let cart = [];
-    let currentTestimonialIndex = 0;
-    const TAX_RATE = 0.15; // 15% GST
-    let deliveryFee = 150; // Rs. 150
-    let trackerInterval = null;
-    let orderListenerUnsubscribe = null;
+    // --- STATE MANAGEMENT ---
+    let cart = JSON.parse(localStorage.getItem('ayssh_cart') || '[]');
+    let activeCategory = 'All';
 
-    // No mock database initialization (starting empty as requested)
-
-    // Sync menu price adjustments from localStorage
-    const syncMenuPrices = () => {
-        const adjustments = JSON.parse(localStorage.getItem('ayssh_menu_adjustments') || '{}');
-        Object.keys(adjustments).forEach(id => {
-            const button = document.querySelector(`.add-to-cart-btn[data-id="${id}"]`);
-            if (button) {
-                // Update internal price data attribute
-                button.setAttribute('data-price', adjustments[id]);
-                // Update visual price tag on the card
-                const cardContainer = button.closest('.menu-info');
-                if (cardContainer) {
-                    const priceTag = cardContainer.querySelector('.menu-item-price');
-                    if (priceTag) {
-                        priceTag.textContent = `Rs. ${adjustments[id]}`;
-                    }
-                }
-            }
-        });
-    };
-    syncMenuPrices();
-
-    // ---- DOM ELEMENTS ----
-    const header = document.querySelector('.header');
-    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-    const navMenu = document.getElementById('navMenu');
-    const navLinks = document.querySelectorAll('.nav-link');
-    
-    // Cart Elements
-    const cartToggle = document.getElementById('cartToggle');
-    const closeCart = document.getElementById('closeCart');
-    const cartDrawer = document.getElementById('cartDrawer');
-    const cartOverlay = document.getElementById('cartOverlay');
-    const cartItemsContainer = document.getElementById('cartItems');
+    // --- DOM ELEMENT REFERENCES ---
+    const menuGrid = document.getElementById('menuGrid');
+    const categoryTabs = document.querySelectorAll('.category-tab');
+    const cartTrigger = document.getElementById('cartTrigger');
     const cartBadge = document.getElementById('cartBadge');
-    const cartSubtotal = document.getElementById('cartSubtotal');
-    const cartTax = document.getElementById('cartTax');
-    const cartTotal = document.getElementById('cartTotal');
-    const checkoutBtn = document.getElementById('checkoutBtn');
-    
-    // Checkout Modal Elements
-    const checkoutModal = document.getElementById('checkoutModal');
-    const closeCheckoutModalBtn = document.getElementById('closeCheckoutModal');
+    const cartDrawer = document.getElementById('cartDrawer');
+    const closeCartDrawer = document.getElementById('closeCartDrawer');
+    const uiOverlay = document.getElementById('uiOverlay');
+    const cartItemsContainer = document.getElementById('cartItemsContainer');
+    const cartTotalVal = document.getElementById('cartTotalVal');
+    const checkoutActionBtn = document.getElementById('checkoutActionBtn');
     const checkoutForm = document.getElementById('checkoutForm');
-    const checkoutType = document.getElementById('checkoutType');
-    const addressGroup = document.getElementById('addressGroup');
-    const checkoutAddress = document.getElementById('checkoutAddress');
-    const checkoutSummaryTotal = document.getElementById('checkoutSummaryTotal');
+    const reservationForm = document.getElementById('reservationForm');
     
-    // Menu Elements
-    const filterButtons = document.querySelectorAll('.filter-btn');
-    const menuCards = document.querySelectorAll('.menu-card');
-    
-    // Reservation Elements
-    const resForm = document.getElementById('resForm');
-    const ticketModal = document.getElementById('ticketModal');
-    const closeModalBtn = document.getElementById('closeModal');
-    
-    // Order Success Modal Elements
-    const orderModal = document.getElementById('orderModal');
-    const closeOrderModalBtn = document.getElementById('closeOrderModal');
-    const orderSummaryItems = document.getElementById('orderSummaryItems');
-    const orderPaidTotal = document.getElementById('orderPaidTotal');
-    const invoiceDeliveryType = document.getElementById('invoiceDeliveryType');
-    const invoicePhone = document.getElementById('invoicePhone');
-    const invoiceAddress = document.getElementById('invoiceAddress');
-    const invoiceAddressRow = document.getElementById('invoiceAddressRow');
-    const invoicePayment = document.getElementById('invoicePayment');
-    
-    // Tracker Elements
-    const trackerProgressBar = document.getElementById('trackerProgressBar');
-    const step1 = document.getElementById('step-1');
-    const step2 = document.getElementById('step-2');
-    const step3 = document.getElementById('step-3');
-    const step4 = document.getElementById('step-4');
-    
-    // Testimonial Elements
-    const testimonialCards = document.querySelectorAll('.testimonial-card');
-    const sliderDots = document.querySelectorAll('.dot');
-    
-    // Map Element
-    const mapPin = document.querySelector('.map-pin');
-    const pinPopup = document.querySelector('.pin-popup');
-
-    // ---- HEADER SCROLL EVENT ----
+    // Header transition on scroll
+    const mainHeader = document.getElementById('mainHeader');
     window.addEventListener('scroll', () => {
         if (window.scrollY > 50) {
-            header.classList.add('scrolled');
+            mainHeader.classList.add('scrolled');
         } else {
-            header.classList.remove('scrolled');
+            mainHeader.classList.remove('scrolled');
         }
+        activateNavLinkOnScroll();
     });
 
-    // ---- MOBILE NAV TOGGLE ----
-    if (mobileMenuBtn) {
-        mobileMenuBtn.addEventListener('click', () => {
-            navMenu.classList.toggle('open');
-            const icon = mobileMenuBtn.querySelector('i');
-            if (navMenu.classList.contains('open')) {
-                icon.className = 'fa-solid fa-xmark';
-            } else {
-                icon.className = 'fa-solid fa-bars';
-            }
-        });
-    }
-
-    // Close mobile menu when clicking a link
+    // Navigation and Scrolling
+    const navLinks = document.querySelectorAll('.nav-link');
     navLinks.forEach(link => {
-        link.addEventListener('click', () => {
-            navMenu.classList.remove('open');
-            if (mobileMenuBtn) {
-                mobileMenuBtn.querySelector('i').className = 'fa-solid fa-bars';
-            }
-        });
-    });
-
-    // ---- CART DRAWER CONTROLS ----
-    const openCartDrawer = () => {
-        cartDrawer.classList.add('open');
-        cartOverlay.classList.add('open');
-        document.body.style.overflow = 'hidden';
-    };
-
-    const closeCartDrawer = () => {
-        cartDrawer.classList.remove('open');
-        cartOverlay.classList.remove('open');
-        document.body.style.overflow = 'auto';
-    };
-
-    cartToggle.addEventListener('click', openCartDrawer);
-    closeCart.addEventListener('click', closeCartDrawer);
-    cartOverlay.addEventListener('click', closeCartDrawer);
-
-    // ---- ADD TO CART FUNCTIONALITY ----
-    document.addEventListener('click', (e) => {
-        if (e.target.classList.contains('add-to-cart-btn')) {
-            const button = e.target;
-            const id = button.getAttribute('data-id');
-            const name = button.getAttribute('data-name');
-            const price = parseFloat(button.getAttribute('data-price'));
+        link.addEventListener('click', (e) => {
+            const targetId = link.getAttribute('data-target');
+            scrollToSection(targetId);
             
-            addToCart(id, name, price);
+            navLinks.forEach(nl => nl.classList.remove('active'));
+            link.classList.add('active');
+        });
+    });
+
+    // Button click redirects
+    document.getElementById('navBookBtn').addEventListener('click', () => scrollToSection('book'));
+    document.getElementById('heroMenuBtn').addEventListener('click', () => scrollToSection('menu'));
+    document.getElementById('heroBookBtn').addEventListener('click', () => scrollToSection('book'));
+
+    function scrollToSection(id) {
+        const element = document.getElementById(id);
+        if (element) {
+            const headerOffset = 80;
+            const elementPosition = element.getBoundingClientRect().top;
+            const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
             
-            // Visual feedback on button click
-            const originalText = button.textContent;
-            button.textContent = 'Added to Bag! ✓';
-            button.style.backgroundColor = '#D4A373';
-            button.style.color = '#14100D';
-            
-            setTimeout(() => {
-                button.textContent = originalText;
-                button.style.backgroundColor = '';
-                button.style.color = '';
-            }, 1200);
-
-            // Open the cart drawer automatically for micro-interaction feedback
-            setTimeout(openCartDrawer, 400);
-        }
-    });
-
-    const addToCart = (id, name, price) => {
-        const existingItem = cart.find(item => item.id === id);
-        
-        if (existingItem) {
-            existingItem.quantity += 1;
-        } else {
-            cart.push({
-                id,
-                name,
-                price,
-                quantity: 1
-            });
-        }
-        
-        updateCartDOM();
-    };
-
-    const updateCartDOM = () => {
-        // Calculate items counts
-        const totalItemsCount = cart.reduce((sum, item) => sum + item.quantity, 0);
-        cartBadge.textContent = totalItemsCount;
-
-        // Render Cart Items
-        if (cart.length === 0) {
-            cartItemsContainer.innerHTML = `
-                <div class="cart-empty-message">
-                    <i class="fa-solid fa-mug-hot"></i>
-                    <p>Your bag is empty. Add some fresh delights!</p>
-                </div>
-            `;
-            cartSubtotal.textContent = 'Rs. 0';
-            cartTax.textContent = 'Rs. 0';
-            cartTotal.textContent = 'Rs. 0';
-            return;
-        }
-
-        let cartHTML = '';
-        let subtotal = 0;
-
-        cart.forEach(item => {
-            const itemTotal = item.price * item.quantity;
-            subtotal += itemTotal;
-            
-            cartHTML += `
-                <div class="cart-item" data-id="${item.id}">
-                    <div class="cart-item-details">
-                        <h4>${item.name}</h4>
-                        <span>Rs. ${item.price}</span>
-                    </div>
-                    <div class="cart-item-quantity">
-                        <button class="qty-btn dec-qty" data-id="${item.id}"><i class="fa-solid fa-minus"></i></button>
-                        <span>${item.quantity}</span>
-                        <button class="qty-btn inc-qty" data-id="${item.id}"><i class="fa-solid fa-plus"></i></button>
-                    </div>
-                    <button class="remove-cart-item" data-id="${item.id}">
-                        <i class="fa-regular fa-trash-can"></i>
-                    </button>
-                </div>
-            `;
-        });
-
-        cartItemsContainer.innerHTML = cartHTML;
-
-        // Calculations
-        const tax = Math.round(subtotal * TAX_RATE);
-        const total = subtotal + tax;
-
-        cartSubtotal.textContent = `Rs. ${subtotal}`;
-        cartTax.textContent = `Rs. ${tax}`;
-        cartTotal.textContent = `Rs. ${total}`;
-
-        // Attach event listeners for item logic
-        attachCartItemEvents();
-    };
-
-    const attachCartItemEvents = () => {
-        // Decrement button
-        document.querySelectorAll('.dec-qty').forEach(btn => {
-            btn.onclick = () => {
-                const id = btn.getAttribute('data-id');
-                const item = cart.find(i => i.id === id);
-                if (item.quantity > 1) {
-                    item.quantity -= 1;
-                } else {
-                    cart = cart.filter(i => i.id !== id);
-                }
-                updateCartDOM();
-            };
-        });
-
-        // Increment button
-        document.querySelectorAll('.inc-qty').forEach(btn => {
-            btn.onclick = () => {
-                const id = btn.getAttribute('data-id');
-                const item = cart.find(i => i.id === id);
-                item.quantity += 1;
-                updateCartDOM();
-            };
-        });
-
-        // Delete button
-        document.querySelectorAll('.remove-cart-item').forEach(btn => {
-            btn.onclick = () => {
-                const id = btn.getAttribute('data-id');
-                cart = cart.filter(i => i.id !== id);
-                updateCartDOM();
-            };
-        });
-    };
-
-    // ---- CHECKOUT TRANSITION FLOW ----
-    checkoutBtn.addEventListener('click', () => {
-        if (cart.length === 0) {
-            alert('Your cart is empty!');
-            return;
-        }
-
-        closeCartDrawer();
-        updateCheckoutModalTotal();
-        checkoutModal.classList.add('open');
-    });
-
-    closeCheckoutModalBtn.addEventListener('click', () => {
-        checkoutModal.classList.remove('open');
-    });
-
-    // Delivery vs Pickup selection in Checkout form
-    checkoutType.addEventListener('change', () => {
-        if (checkoutType.value === 'pickup') {
-            addressGroup.style.display = 'none';
-            checkoutAddress.removeAttribute('required');
-            deliveryFee = 0;
-        } else {
-            addressGroup.style.display = 'block';
-            checkoutAddress.setAttribute('required', 'required');
-            deliveryFee = 150;
-        }
-        updateCheckoutModalTotal();
-    });
-
-    const updateCheckoutModalTotal = () => {
-        const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-        const tax = Math.round(subtotal * TAX_RATE);
-        const finalTotal = subtotal + tax + deliveryFee;
-        checkoutSummaryTotal.textContent = `Rs. ${finalTotal}`;
-    };
-
-    // ---- FINAL CHECKOUT FORM SUBMISSION & DELIVERY TRACKER ----
-    checkoutForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-
-        // Get checkout details
-        const phone = document.getElementById('checkoutPhone').value;
-        const address = checkoutAddress.value;
-        const paymentValue = document.getElementById('checkoutPayment').value;
-        const typeValue = checkoutType.value;
-
-        // Payment text translation
-        let paymentText = 'Cash on Delivery';
-        if (paymentValue === 'card') paymentText = 'Credit / Debit Card';
-        if (paymentValue === 'wallet') paymentText = 'Mobile Wallet (EasyPaisa/JazzCash)';
-
-        // Render Invoice Modal Details
-        let summaryHTML = '';
-        let subtotal = 0;
-        cart.forEach(item => {
-            const itemTotal = item.price * item.quantity;
-            subtotal += itemTotal;
-            summaryHTML += `
-                <div class="order-summary-item">
-                    <span>${item.name} (x${item.quantity})</span>
-                    <span>Rs. ${itemTotal}</span>
-                </div>
-            `;
-        });
-        
-        const tax = Math.round(subtotal * TAX_RATE);
-        const finalTotal = subtotal + tax + deliveryFee;
-
-        // Delivery details in invoice
-        invoicePhone.textContent = phone;
-        invoicePayment.textContent = paymentText;
-        if (typeValue === 'pickup') {
-            invoiceDeliveryType.textContent = 'Self-Pickup (Free)';
-            invoiceAddressRow.style.display = 'none';
-        } else {
-            invoiceDeliveryType.textContent = `Home Delivery (Rs. ${deliveryFee} fee added)`;
-            invoiceAddressRow.style.display = 'flex';
-            invoiceAddress.textContent = address;
-        }
-
-        orderSummaryItems.innerHTML = summaryHTML;
-        // Append delivery and GST detail lines to summary
-        orderSummaryItems.innerHTML += `
-            <hr style="border: none; border-top: 1px dashed var(--border-color); margin: 8px 0;">
-            <div class="order-summary-item">
-                <span style="color: var(--text-muted);">Cart Subtotal</span>
-                <span>Rs. ${subtotal}</span>
-            </div>
-            <div class="order-summary-item">
-                <span style="color: var(--text-muted);">GST (15%)</span>
-                <span>Rs. ${tax}</span>
-            </div>
-            <div class="order-summary-item">
-                <span style="color: var(--text-muted);">Delivery Charges</span>
-                <span>Rs. ${deliveryFee}</span>
-            </div>
-        `;
-        orderPaidTotal.textContent = `Rs. ${finalTotal}`;
-
-        // Save to localStorage
-        const orders = JSON.parse(localStorage.getItem('ayssh_orders') || '[]');
-        
-        // Generate Sequential Order ID
-        let nextOrderNum = parseInt(localStorage.getItem('ayssh_order_counter') || '0');
-        const orderId = '#ORD-' + nextOrderNum;
-        localStorage.setItem('ayssh_order_counter', nextOrderNum + 1);
-
-        const newOrder = {
-            id: orderId,
-            phone: phone,
-            address: address || 'N/A',
-            paymentType: paymentText,
-            deliveryType: typeValue === 'pickup' ? 'Pickup' : 'Delivery',
-            items: cart.map(item => ({ name: item.name, quantity: item.quantity, price: item.price })),
-            subtotal: subtotal,
-            tax: tax,
-            deliveryFee: deliveryFee,
-            total: finalTotal,
-            status: 'Processing',
-            timestamp: new Date().toISOString()
-        };
-        orders.push(newOrder);
-        localStorage.setItem('ayssh_orders', JSON.stringify(orders));
-
-        // Save to Firebase Firestore if initialized
-        if (db) {
-            db.collection('orders').doc(orderId).set(newOrder).catch(err => {
-                console.error("Firestore Order Save Error:", err);
-            });
-        }
-
-        // Close Checkout form, open Success Modal
-        checkoutModal.classList.remove('open');
-        orderModal.classList.add('open');
-
-        // Clear Cart State
-        cart = [];
-        updateCartDOM();
-
-        // Launch Live Delivery Status Tracker
-        startOrderDeliveryTracker(orderId, typeValue === 'pickup');
-    });
-
-    // ---- LIVE DELIVERY TRACKER LOGIC ----
-    const startOrderDeliveryTracker = (orderId, isPickup) => {
-        // Clear any previous interval or unsubscribe
-        if (trackerInterval) clearInterval(trackerInterval);
-        if (orderListenerUnsubscribe) {
-            orderListenerUnsubscribe();
-            orderListenerUnsubscribe = null;
-        }
-
-        // Update step titles dynamically if pickup
-        if (isPickup) {
-            step3.querySelector('span').textContent = 'Ready';
-            step3.querySelector('.step-icon i').className = 'fa-solid fa-cookie-bite';
-            step4.querySelector('span').textContent = 'Picked Up';
-        } else {
-            step3.querySelector('span').textContent = 'On the Way';
-            step3.querySelector('.step-icon i').className = 'fa-solid fa-motorcycle';
-            step4.querySelector('span').textContent = 'Delivered';
-        }
-
-        // Reset tracker visuals to step 1 active
-        trackerProgressBar.style.width = '0%';
-        resetStepsClasses();
-        step1.classList.add('active');
-
-        // Check if Firebase is configured & initialized
-        if (db && orderId) {
-            orderListenerUnsubscribe = db.collection('orders').doc(orderId).onSnapshot(doc => {
-                if (doc.exists) {
-                    const ord = doc.data();
-                    const status = ord.status || 'Processing';
-                    
-                    resetStepsClasses();
-                    
-                    if (status === 'Processing') {
-                        step1.classList.add('active');
-                        trackerProgressBar.style.width = '0%';
-                    } else if (status === 'Preparing') {
-                        step1.classList.add('completed');
-                        step2.classList.add('active');
-                        trackerProgressBar.style.width = '33%';
-                    } else if (status === 'Dispatching') {
-                        step1.classList.add('completed');
-                        step2.classList.add('completed');
-                        step3.classList.add('active');
-                        trackerProgressBar.style.width = '66%';
-                    } else if (status === 'Completed') {
-                        step1.classList.add('completed');
-                        step2.classList.add('completed');
-                        step3.classList.add('completed');
-                        step4.classList.add('active');
-                        step4.classList.add('completed');
-                        trackerProgressBar.style.width = '100%';
-                    }
-                }
-            }, err => {
-                console.error("Firestore listening error:", err);
-            });
-        } else {
-            // Fallback simulator if Firebase is not active
-            let currentStep = 1;
-            trackerInterval = setInterval(() => {
-                currentStep++;
-                if (currentStep === 2) {
-                    step1.classList.remove('active');
-                    step1.classList.add('completed');
-                    step2.classList.add('active');
-                    trackerProgressBar.style.width = '33%';
-                } else if (currentStep === 3) {
-                    step2.classList.remove('active');
-                    step2.classList.add('completed');
-                    step3.classList.add('active');
-                    trackerProgressBar.style.width = '66%';
-                } else if (currentStep === 4) {
-                    step3.classList.remove('active');
-                    step3.classList.add('completed');
-                    step4.classList.add('active');
-                    step4.classList.add('completed');
-                    trackerProgressBar.style.width = '100%';
-                    clearInterval(trackerInterval);
-                }
-            }, 5000);
-        }
-    };
-
-    const resetStepsClasses = () => {
-        const steps = [step1, step2, step3, step4];
-        steps.forEach(step => {
-            step.classList.remove('active', 'completed');
-        });
-    };
-
-    closeOrderModalBtn.addEventListener('click', () => {
-        orderModal.classList.remove('open');
-        if (trackerInterval) {
-            clearInterval(trackerInterval);
-        }
-        if (orderListenerUnsubscribe) {
-            orderListenerUnsubscribe();
-            orderListenerUnsubscribe = null;
-        }
-    });
-
-    // ---- MENU CATEGORY FILTER ----
-    filterButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            // Remove active state from all buttons
-            filterButtons.forEach(btn => btn.classList.remove('active'));
-            // Add active to clicked button
-            button.classList.add('active');
-
-            const filterValue = button.getAttribute('data-filter');
-
-            menuCards.forEach(card => {
-                const category = card.getAttribute('data-category');
-                
-                // Card transitions
-                card.style.opacity = '0';
-                card.style.transform = 'scale(0.85) translateY(10px)';
-
-                setTimeout(() => {
-                    if (filterValue === 'all' || category === filterValue) {
-                        card.style.display = 'block';
-                        setTimeout(() => {
-                            card.style.opacity = '1';
-                            card.style.transform = 'scale(1) translateY(0)';
-                        }, 50);
-                    } else {
-                        card.style.display = 'none';
-                    }
-                }, 300);
-            });
-        });
-    });
-
-    // ---- RESERVATION SUBMISSION ----
-    if (resForm) {
-        const todayStr = new Date().toISOString().split('T')[0];
-        document.getElementById('resDate').setAttribute('min', todayStr);
-        document.getElementById('resDate').value = todayStr;
-
-        resForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-
-            // Fetch inputs
-            const name = document.getElementById('resName').value;
-            const guests = document.getElementById('resGuests').value;
-            const table = document.getElementById('resTable').value;
-            const date = document.getElementById('resDate').value;
-            const time = document.getElementById('resTime').value;
-
-            // Generate Sequential Booking ID
-            let nextBookingNum = parseInt(localStorage.getItem('ayssh_booking_counter') || '0');
-            const randomId = '#AC-' + nextBookingNum;
-            localStorage.setItem('ayssh_booking_counter', nextBookingNum + 1);
-
-            // Populate Ticket Modal
-            document.getElementById('ticketId').textContent = randomId;
-            document.getElementById('ticketName').textContent = name;
-            document.getElementById('ticketDate').textContent = date;
-            document.getElementById('ticketTime').textContent = time;
-            document.getElementById('ticketGuests').textContent = guests === '1' ? '1 Person' : guests + ' People';
-            document.getElementById('ticketTable').textContent = table;
-
-            // Save to localStorage
-            const bookings = JSON.parse(localStorage.getItem('ayssh_bookings') || '[]');
-            const newBooking = {
-                id: randomId,
-                name: name,
-                guests: guests === '1' ? '1 Person' : guests + ' People',
-                table: table,
-                date: date,
-                time: time,
-                timestamp: new Date().toISOString()
-            };
-            bookings.push(newBooking);
-            localStorage.setItem('ayssh_bookings', JSON.stringify(bookings));
-
-            // Save to Firebase Firestore if initialized
-            if (db) {
-                db.collection('bookings').doc(randomId).set(newBooking).catch(err => {
-                    console.error("Firestore Booking Save Error:", err);
-                });
-            }
-
-            // Show ticket modal
-            ticketModal.classList.add('open');
-
-            // Reset form
-            resForm.reset();
-            document.getElementById('resDate').value = todayStr;
-        });
-    }
-
-    closeModalBtn.addEventListener('click', () => {
-        ticketModal.classList.remove('open');
-    });
-
-    // ---- TESTIMONIALS SLIDER ----
-    const showTestimonial = (index) => {
-        testimonialCards.forEach((card, idx) => {
-            card.classList.remove('active');
-            sliderDots[idx].classList.remove('active');
-            if (idx === index) {
-                card.classList.add('active');
-                sliderDots[idx].classList.add('active');
-            }
-        });
-        
-        const slider = document.getElementById('testimonialsSlider');
-        slider.style.transform = `translateX(-${index * 100}%)`;
-    };
-
-    sliderDots.forEach(dot => {
-        dot.addEventListener('click', () => {
-            const index = parseInt(dot.getAttribute('data-index'));
-            currentTestimonialIndex = index;
-            showTestimonial(index);
-        });
-    });
-
-    // Auto rotate every 5 seconds
-    setInterval(() => {
-        currentTestimonialIndex = (currentTestimonialIndex + 1) % testimonialCards.length;
-        showTestimonial(currentTestimonialIndex);
-    }, 5000);
-
-    // ---- MAP PIN MICRO-INTERACTION ----
-    if (mapPin) {
-        mapPin.addEventListener('click', () => {
-            pinPopup.style.display = pinPopup.style.display === 'none' ? 'block' : 'none';
-        });
-        pinPopup.style.display = 'block';
-    }
-
-    // ==========================================
-    // 3D Animations & Scrolling Effects (Added)
-    // ==========================================
-
-    // 1. Viewport Reveal Animations (Scroll Reveal)
-    const revealElements = document.querySelectorAll('.reveal, .reveal-left, .reveal-right');
-    
-    if (revealElements.length > 0) {
-        const revealObserver = new IntersectionObserver((entries, observer) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('active');
-                    // Stop observing once revealed
-                    observer.unobserve(entry.target);
-                }
-            });
-        }, {
-            threshold: 0.12, // Trigger when 12% of the element is visible
-            rootMargin: '0px 0px -40px 0px' // Offset bottom margin for better entrance timing
-        });
-
-        // Setup stagger animations dynamically for grids
-        document.querySelectorAll('.menu-grid, .stats-grid').forEach(grid => {
-            const items = grid.querySelectorAll('.reveal');
-            items.forEach((item, index) => {
-                item.style.transitionDelay = `${index * 0.1}s`;
-            });
-        });
-
-        revealElements.forEach(el => {
-            revealObserver.observe(el);
-        });
-    }
-
-    // 2. Scroll Progress Bar & Scroll To Top Button
-    const progressBar = document.getElementById('scrollProgress');
-    const scrollTopBtn = document.getElementById('scrollTopBtn');
-
-    window.addEventListener('scroll', () => {
-        // Progress Bar Width
-        const scrollTop = window.scrollY;
-        const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-        if (progressBar && docHeight > 0) {
-            const scrollPercent = (scrollTop / docHeight) * 100;
-            progressBar.style.width = scrollPercent + '%';
-        }
-
-        // Show/Hide Scroll to Top Button
-        if (scrollTopBtn) {
-            if (scrollTop > 400) {
-                scrollTopBtn.classList.add('show');
-            } else {
-                scrollTopBtn.classList.remove('show');
-            }
-        }
-    });
-
-    // Scroll back to top smoothly
-    if (scrollTopBtn) {
-        scrollTopBtn.addEventListener('click', () => {
             window.scrollTo({
-                top: 0,
+                top: offsetPosition,
                 behavior: 'smooth'
             });
-        });
+        }
     }
 
-    // 3. 3D Tilt Hover Effects on Cards
-    const tiltCards = document.querySelectorAll('.menu-card, .testimonial-card');
+    function activateNavLinkOnScroll() {
+        const sections = ['home', 'menu', 'book', 'track'];
+        const scrollPosition = window.scrollY + 120;
 
-    tiltCards.forEach(card => {
-        // Dynamic tilt calculation
-        card.addEventListener('mousemove', (e) => {
-            const rect = card.getBoundingClientRect();
-            
-            // Mouse position relative to the element bounding box
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-
-            // Element dimensions
-            const width = rect.width;
-            const height = rect.height;
-
-            // Normalize coordinate system so the center of the card is (0,0)
-            const centerX = width / 2;
-            const centerY = height / 2;
-
-            // Normalize values from -1 to 1
-            const normalizedX = (x - centerX) / centerX; // -1 on left, +1 on right
-            const normalizedY = (y - centerY) / centerY; // -1 on top, +1 on bottom
-
-            // Rotations (max 8 degrees for premium look)
-            const maxTilt = 8;
-            const tiltY = (normalizedX * maxTilt).toFixed(2); // Y rotation depends on X cursor offset
-            const tiltX = (normalizedY * -maxTilt).toFixed(2); // X rotation depends on Y cursor offset (inverted)
-
-            // Temporary set quick transition for mouse movements
-            card.style.transition = 'transform 0.1s ease-out, border-color 0.4s ease, box-shadow 0.4s ease';
-            card.style.transform = `perspective(1000px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) translateY(-8px) scale(1.02)`;
-
-            // Push details inside the card in 3D
-            const popElements = card.querySelectorAll('.menu-img-wrapper, .menu-item-title, .menu-item-price, .add-to-cart-btn, .quote, .user-info');
-            popElements.forEach(el => {
-                el.style.transform = 'translateZ(30px)';
-            });
-        });
-
-        // Reset smooth state when mouse leaves
-        card.addEventListener('mouseleave', () => {
-            card.style.transition = 'transform 0.6s cubic-bezier(0.25, 1, 0.5, 1), border-color 0.4s ease, box-shadow 0.4s ease';
-            card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0) scale(1)';
-            
-            const popElements = card.querySelectorAll('.menu-img-wrapper, .menu-item-title, .menu-item-price, .add-to-cart-btn, .quote, .user-info');
-            popElements.forEach(el => {
-                el.style.transform = 'translateZ(0px)';
-            });
-        });
-    });
-
-    // 4. Hero Mouse Parallax Effect
-    const heroSection = document.querySelector('.hero-section');
-    const heroDecoItems = document.querySelectorAll('.hero-deco');
-
-    if (heroSection && heroDecoItems.length > 0) {
-        heroSection.addEventListener('mousemove', (e) => {
-            const width = window.innerWidth;
-            const height = window.innerHeight;
-
-            // Normalized coordinates from -0.5 to 0.5
-            const mouseX = (e.clientX / width) - 0.5;
-            const mouseY = (e.clientY / height) - 0.5;
-
-            heroDecoItems.forEach(item => {
-                const speed = parseFloat(item.getAttribute('data-speed')) || 2;
-                const xVal = (mouseX * speed * 25).toFixed(2);
-                const yVal = (mouseY * speed * 25).toFixed(2);
-
-                // Combine float keyframes with mouse parallax offsets
-                item.style.transform = `translate3d(${xVal}px, ${yVal}px, 0)`;
-            });
-        });
-
-        // Reset positions smoothly on mouse leave
-        heroSection.addEventListener('mouseleave', () => {
-            heroDecoItems.forEach(item => {
-                item.style.transition = 'transform 0.8s cubic-bezier(0.25, 1, 0.5, 1)';
-                item.style.transform = 'translate3d(0, 0, 0)';
-                // Remove transition after reset to keep mousemove smooth
-                setTimeout(() => {
-                    item.style.transition = '';
-                }, 800);
-            });
-        });
-    }
-
-    // 5. Dynamic Single Page Section Switching (SPA)
-    const showSection = (targetId) => {
-        const sections = document.querySelectorAll('main > section');
-        const targetSection = document.getElementById(targetId);
-        
-        if (!targetSection) return;
-
-        sections.forEach(sec => {
-            if (sec.id === targetId) {
-                sec.style.display = 'block';
-                // Force layout reflow
-                sec.offsetHeight; 
-                sec.classList.add('active-section');
-                sec.classList.add('active'); // trigger reveal animations inside it!
-                
-                // Trigger reveal children inside this section too
-                sec.querySelectorAll('.reveal, .reveal-left, .reveal-right').forEach(child => {
-                    child.classList.add('active');
-                });
-            } else {
-                sec.classList.remove('active-section');
-                sec.style.display = 'none';
-            }
-        });
-
-        // Scroll to top of page smoothly and instantly
-        window.scrollTo({ top: 0, behavior: 'instant' });
-    };
-
-    // Global listener for internal links
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function(e) {
-            const targetHref = this.getAttribute('href');
-            if (targetHref.length <= 1) return;
-            
-            const targetId = targetHref.substring(1);
-            const targetSection = document.getElementById(targetId);
-            
-            if (targetSection && targetSection.tagName === 'SECTION') {
-                e.preventDefault();
-                showSection(targetId);
-                
-                // Sync Navbar Active Class
-                document.querySelectorAll('.nav-link').forEach(link => {
-                    link.classList.remove('active');
-                    if (link.getAttribute('href') === `#${targetId}`) {
-                        link.classList.add('active');
-                    }
-                });
-
-                // Update location hash without scrolling automatically
-                history.pushState(null, null, `#${targetId}`);
-
-                // Close mobile menu if open
-                const navMenu = document.getElementById('navMenu');
-                if (navMenu && navMenu.classList.contains('open')) {
-                    navMenu.classList.remove('open');
-                }
-            }
-        });
-    });
-
-    // Check initial hash on load
-    const initialHash = window.location.hash.substring(1);
-    if (initialHash && document.getElementById(initialHash)) {
-        showSection(initialHash);
-        document.querySelectorAll('.nav-link').forEach(link => {
-            link.classList.remove('active');
-            if (link.getAttribute('href') === `#${initialHash}`) {
-                link.classList.add('active');
-            }
-        });
-    } else {
-        // Show home by default
-        showSection('home');
-    }
-
-    // ---- CHATBOT WIDGET CONTROLLERS ----
-    const chatbotBubble = document.getElementById('chatbotBubble');
-    const chatbotWindow = document.getElementById('chatbotWindow');
-    const closeChatbot = document.getElementById('closeChatbot');
-    const chatbotForm = document.getElementById('chatbotForm');
-    const chatbotInput = document.getElementById('chatbotInput');
-    const chatbotFeed = document.getElementById('chatbotFeed');
-    const promptChips = document.querySelectorAll('.chatbot-prompt-chip');
-
-    // Toggle Chatbot Window Open/Close
-    chatbotBubble.addEventListener('click', () => {
-        chatbotBubble.classList.add('active');
-        chatbotWindow.classList.toggle('open');
-        // Clear bubble notifications
-        const notification = chatbotBubble.querySelector('.chatbot-notification');
-        if (notification) notification.style.display = 'none';
-        
-        // Auto scroll to bottom
-        chatbotFeed.scrollTop = chatbotFeed.scrollHeight;
-    });
-
-    closeChatbot.addEventListener('click', () => {
-        chatbotWindow.classList.remove('open');
-    });
-
-    // Helper to append message bubble to feed
-    const appendChatMessage = (text, sender) => {
-        const msgDiv = document.createElement('div');
-        msgDiv.className = `chatbot-msg ${sender}`;
-        msgDiv.innerHTML = `<div class="chatbot-msg-bubble">${text}</div>`;
-        chatbotFeed.appendChild(msgDiv);
-        chatbotFeed.scrollTop = chatbotFeed.scrollHeight;
-    };
-
-    // Helper to render Typing Indicator
-    const showTypingIndicator = () => {
-        const typingDiv = document.createElement('div');
-        typingDiv.className = 'chatbot-msg bot temp-typing';
-        typingDiv.innerHTML = `
-            <div class="chatbot-msg-bubble typing-indicator">
-                <span></span><span></span><span></span>
-            </div>
-        `;
-        chatbotFeed.appendChild(typingDiv);
-        chatbotFeed.scrollTop = chatbotFeed.scrollHeight;
-        return typingDiv;
-    };
-
-    // Chatbot Reply mapping dictionary
-    const getBotResponse = (text) => {
-        const cleanVal = text.toLowerCase().trim();
-
-        if (cleanVal.includes('time') || cleanVal.includes('hour') || cleanVal.includes('timing') || cleanVal.includes('open') || cleanVal.includes('close')) {
-            return "🕒 We are open daily from **8:00 AM to 11:00 PM**. Feel free to drop by for fresh brews or cakes anytime!";
-        }
-        if (cleanVal.includes('locate') || cleanVal.includes('address') || cleanVal.includes('where') || cleanVal.includes('map') || cleanVal.includes('karachi')) {
-            return "📍 We are located at **102 Cocoa Bean Blvd, Clifton, Karachi**. Drop by to experience our premium coffee retreat!";
-        }
-        if (cleanVal.includes('book') || cleanVal.includes('reserve') || cleanVal.includes('table') || cleanVal.includes('seat')) {
-            return "📅 Sure! You can book a table directly in our <a href='#reservation' class='chatbot-link' style='color: var(--primary); font-weight: 700; text-decoration: underline;'>Book Table</a> section. Select your slot and confirm instantly!";
-        }
-        if (cleanVal.includes('special') || cleanVal.includes('today') || cleanVal.includes('recommend') || cleanVal.includes('best')) {
-            return "✨ Today's Special recommendation:\n• **Espresso Romano** matched with **Butter Almond Biscotti** ☕\n• Or try our popular **Chocolate Fudge Truffle** slice! 🍰";
-        }
-        if (cleanVal.includes('cake') || cleanVal.includes('sweet') || cleanVal.includes('chocolate') || cleanVal.includes('lemon')) {
-            return "🍰 We serve three premium cakes:\n• **Chocolate Fudge Truffle** (Rs. 950)\n• **Velvet Rose Cake** (Rs. 1200)\n• **Lemon Drizzle Cake** (Rs. 850)";
-        }
-        if (cleanVal.includes('cookie') || cleanVal.includes('biscuit') || cleanVal.includes('coconut')) {
-            return "🍪 Check out our artisanal crunchies:\n• **Choco-Chip Giant Cookie** (Rs. 180)\n• **Butter Almond Biscotti** (Rs. 220)\n• **Coconut Crunch Biscuits** (Rs. 150)";
-        }
-        if (cleanVal.includes('hello') || cleanVal.includes('hi') || cleanVal.includes('hey') || cleanVal.includes('hola')) {
-            return "👋 Hey there! Welcome to Ayssh Cafe. Ask me about our cafe timings, location, table reservations, or specials!";
-        }
-        
-        // Fallback response
-        return "☕ I'm a helper bot for Ayssh Cafe! Ask me about our **timings**, **location**, **table reservations**, or **specials**, and I will assist you instantly.";
-    };
-
-    // Process Bot message with simulated typing delay (or Groq LPU API)
-    const processBotReply = async (userText) => {
-        const indicator = showTypingIndicator();
-        
-        // Hardcode your Groq API Key here (starts with gsk_...) so the chatbot works for all online visitors.
-        // WARNING: Since this is a static site, this key will be visible in the browser source code.
-        const HARDCODED_API_KEY = "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"; 
-        const apiKey = localStorage.getItem('ayssh_groq_api_key') || HARDCODED_API_KEY;
-
-        if (apiKey) {
-            try {
-                // System instructions to customize Groq for Ayssh Cafe
-                const systemPrompt = `You are the friendly, elegant AI Assistant host for Ayssh Cafe in Clifton, Karachi.
-• Cafe Timings: 8:00 AM to 11:00 PM.
-• Menu Items: Premium Cappuccino (Rs. 450), Traditional Karak Chai (Rs. 250), Caramel Macchiato (Rs. 550), Chocolate Fudge Truffle (Rs. 950), Velvet Rose Cake (Rs. 1200), Lemon Drizzle Cake (Rs. 850), Choco-Chip Giant Cookie (Rs. 180), Butter Almond Biscotti (Rs. 220), Coconut Crunch Biscuits (Rs. 150).
-• Table Reservations: Visitors can reserve tables online. If they ask about booking a table, provide them with this link: <a href='#reservation' class='chatbot-link' style='color: var(--primary); font-weight: 700; text-decoration: underline;'>Book Table</a>.
-Keep your responses polite, warm, premium, concise, and helpful. Do not talk about unrelated things unless the user asks general questions, but always maintain your persona as the Ayssh Cafe host. Output standard HTML formatting or bold markers.`;
-
-                const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-                    method: 'POST',
-                    headers: { 
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${apiKey}`
-                    },
-                    body: JSON.stringify({
-                        messages: [
-                            { role: 'system', content: systemPrompt },
-                            { role: 'user', content: userText }
-                        ],
-                        model: 'llama-3.1-8b-instant',
-                        stream: false
-                    })
-                });
-
-                const data = await response.json();
-                indicator.remove();
-
-                if (data.choices && data.choices[0] && data.choices[0].message) {
-                    let aiText = data.choices[0].message.content;
-                    // Format bold markers and line breaks
-                    aiText = aiText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-                    aiText = aiText.replace(/\n/g, '<br>');
-                    appendChatMessage(aiText, 'bot');
-                } else {
-                    throw new Error('Invalid response structure');
-                }
-            } catch (err) {
-                console.error('Groq API Error:', err);
-                indicator.remove();
-                // Fallback to local
-                const rawReply = getBotResponse(userText);
-                const formattedReply = rawReply.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-                appendChatMessage(formattedReply + "<br><br><span style='font-size:0.75rem; color:var(--text-muted);'>(Note: API key connection error. Showing local response.)</span>", 'bot');
-            }
-        } else {
-            // Standard local keyword matcher fallback
-            setTimeout(() => {
-                indicator.remove();
-                const rawReply = getBotResponse(userText);
-                const formattedReply = rawReply.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-                // Append notice that user can connect real Groq
-                const inviteNotice = "<br><br><span style='font-size:0.75rem; color:var(--text-muted);'>(You can connect a real Groq AI API key in the Admin Portal to chat with me about anything!)</span>";
-                appendChatMessage(formattedReply + inviteNotice, 'bot');
-            }, 900);
-        }
-    };
-
-    // Submitting message through input form
-    chatbotForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const userText = chatbotInput.value;
-        if (!userText.trim()) return;
-
-        appendChatMessage(userText, 'user');
-        chatbotInput.value = '';
-        processBotReply(userText);
-    });
-
-    // Submitting message through prompt chips
-    promptChips.forEach(chip => {
-        chip.addEventListener('click', () => {
-            const promptType = chip.getAttribute('data-prompt');
-            let userText = '';
-
-            if (promptType === 'timings') userText = 'What are your timings?';
-            if (promptType === 'location') userText = 'Where are you located?';
-            if (promptType === 'book') userText = 'How do I book a table?';
-            if (promptType === 'specials') userText = 'What are your specials?';
-
-            appendChatMessage(userText, 'user');
-            processBotReply(userText);
-        });
-    });
-
-    // Intercept click on links dynamically added in bot replies
-    chatbotFeed.addEventListener('click', (e) => {
-        if (e.target.classList.contains('chatbot-link')) {
-            e.preventDefault();
-            // Close chatbot window
-            chatbotWindow.classList.remove('open');
-            // Navigate to SPA section
-            const targetId = e.target.getAttribute('href').substring(1);
-            showSection(targetId);
-            // Sync Navbar Active Class
-            document.querySelectorAll('.nav-link').forEach(link => {
-                link.classList.remove('active');
-                if (link.getAttribute('href') === `#${targetId}`) {
-                    link.classList.add('active');
-                }
-            });
-            // Update hash
-            history.pushState(null, null, `#${targetId}`);
-        }
-    });
-
-    // ---- DEDICATED FULL-PAGE CHATBOT CONTROLLERS ----
-    const pageChatForm = document.getElementById('pageChatForm');
-    const pageChatInput = document.getElementById('pageChatInput');
-    const pageChatFeed = document.getElementById('pageChatFeed');
-    const pagePromptChips = document.querySelectorAll('.page-prompt-chip');
-
-    // Helper to append message bubble to page feed
-    const appendPageChatMessage = (text, sender) => {
-        const msgDiv = document.createElement('div');
-        msgDiv.className = `page-chat-msg ${sender}`;
-        msgDiv.innerHTML = `<div class="page-chat-bubble">${text}</div>`;
-        if (pageChatFeed) {
-            pageChatFeed.appendChild(msgDiv);
-            pageChatFeed.scrollTop = pageChatFeed.scrollHeight;
-        }
-    };
-
-    // Helper to render Typing Indicator on page feed
-    const showPageTypingIndicator = () => {
-        const typingDiv = document.createElement('div');
-        typingDiv.className = 'page-chat-msg bot temp-typing';
-        typingDiv.innerHTML = `
-            <div class="page-chat-bubble typing-indicator">
-                <span></span><span></span><span></span>
-            </div>
-        `;
-        if (pageChatFeed) {
-            pageChatFeed.appendChild(typingDiv);
-            pageChatFeed.scrollTop = pageChatFeed.scrollHeight;
-        }
-        return typingDiv;
-    };
-
-    // Process Bot message with simulated typing delay (or Groq LPU API) for full-page
-    const processPageBotReply = async (userText) => {
-        const indicator = showPageTypingIndicator();
-        
-        const HARDCODED_API_KEY = "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"; 
-        const apiKey = localStorage.getItem('ayssh_groq_api_key') || HARDCODED_API_KEY;
-
-        if (apiKey) {
-            try {
-                // System instructions to customize Groq for Ayssh Cafe
-                const systemPrompt = `You are the friendly, elegant AI Assistant host for Ayssh Cafe in Clifton, Karachi.
-• Cafe Timings: 8:00 AM to 11:00 PM.
-• Menu Items: Premium Cappuccino (Rs. 450), Traditional Karak Chai (Rs. 250), Caramel Macchiato (Rs. 550), Chocolate Fudge Truffle (Rs. 950), Velvet Rose Cake (Rs. 1200), Lemon Drizzle Cake (Rs. 850), Choco-Chip Giant Cookie (Rs. 180), Butter Almond Biscotti (Rs. 220), Coconut Crunch Biscuits (Rs. 150).
-• Table Reservations: Visitors can reserve tables online. If they ask about booking a table, provide them with this link: <a href='#reservation' class='chatbot-link' style='color: var(--primary); font-weight: 700; text-decoration: underline;'>Book Table</a>.
-Keep your responses polite, warm, premium, concise, and helpful. Do not talk about unrelated things unless the user asks general questions, but always maintain your persona as the Ayssh Cafe host. Output standard HTML formatting or bold markers.`;
-
-                const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-                    method: 'POST',
-                    headers: { 
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${apiKey}`
-                    },
-                    body: JSON.stringify({
-                        messages: [
-                            { role: 'system', content: systemPrompt },
-                            { role: 'user', content: userText }
-                        ],
-                        model: 'llama-3.1-8b-instant',
-                        stream: false
-                    })
-                });
-
-                const data = await response.json();
-                indicator.remove();
-
-                if (data.choices && data.choices[0] && data.choices[0].message) {
-                    let aiText = data.choices[0].message.content;
-                    // Format bold markers and line breaks
-                    aiText = aiText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-                    aiText = aiText.replace(/\n/g, '<br>');
-                    appendPageChatMessage(aiText, 'bot');
-                } else {
-                    throw new Error('Invalid response structure');
-                }
-            } catch (err) {
-                console.error('Groq API Error:', err);
-                indicator.remove();
-                // Fallback to local
-                const rawReply = getBotResponse(userText);
-                const formattedReply = rawReply.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-                appendPageChatMessage(formattedReply, 'bot');
-            }
-        } else {
-            // Standard local keyword matcher fallback
-            setTimeout(() => {
-                indicator.remove();
-                const rawReply = getBotResponse(userText);
-                const formattedReply = rawReply.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-                appendPageChatMessage(formattedReply, 'bot');
-            }, 900);
-        }
-    };
-
-    // Submitting message through page input form
-    if (pageChatForm) {
-        pageChatForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const userText = pageChatInput.value;
-            if (!userText.trim()) return;
-
-            appendPageChatMessage(userText, 'user');
-            pageChatInput.value = '';
-            processPageBotReply(userText);
-        });
-    }
-
-    // Submitting message through page prompt chips
-    pagePromptChips.forEach(chip => {
-        chip.addEventListener('click', () => {
-            const promptType = chip.getAttribute('data-prompt');
-            let queryText = '';
-
-            if (promptType === 'timings') queryText = 'What are your café timings?';
-            else if (promptType === 'location') queryText = 'Where is the café located?';
-            else if (promptType === 'book') queryText = 'How do I book a table?';
-            else if (promptType === 'specials') queryText = 'What are today\'s specials?';
-
-            if (queryText) {
-                appendPageChatMessage(queryText, 'user');
-                processPageBotReply(queryText);
-            }
-        });
-    });
-
-    // Intercept click on links dynamically added in page bot replies
-    if (pageChatFeed) {
-        pageChatFeed.addEventListener('click', (e) => {
-            if (e.target.classList.contains('chatbot-link') || e.target.tagName === 'A') {
-                const targetHref = e.target.getAttribute('href');
-                if (targetHref && targetHref.startsWith('#')) {
-                    e.preventDefault();
-                    const targetId = targetHref.substring(1);
-                    showSection(targetId);
-                    // Sync Navbar Active Class
-                    document.querySelectorAll('.nav-link').forEach(link => {
-                        link.classList.remove('active');
-                        if (link.getAttribute('href') === `#${targetId}`) {
+        sections.forEach(secId => {
+            const el = document.getElementById(secId);
+            if (el) {
+                const top = el.offsetTop;
+                const height = el.offsetHeight;
+                if (scrollPosition >= top && scrollPosition < top + height) {
+                    navLinks.forEach(link => {
+                        if (link.getAttribute('data-target') === secId) {
                             link.classList.add('active');
+                        } else {
+                            link.classList.remove('active');
                         }
                     });
-                    // Update hash
-                    history.pushState(null, null, `#${targetId}`);
                 }
             }
         });
     }
+
+    // --- MENU CONTROLLER ---
+    function getAdjustedPrice(itemId, basePrice) {
+        const adjustments = JSON.parse(localStorage.getItem('ayssh_menu_adjustments') || '{}');
+        return adjustments[itemId] ? parseInt(adjustments[itemId]) : basePrice;
+    }
+
+    function renderMenu() {
+        menuGrid.innerHTML = '';
+        const filteredItems = MENU_ITEMS.filter(item => {
+            return activeCategory === 'All' || item.category === activeCategory;
+        });
+
+        if (filteredItems.length === 0) {
+            menuGrid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: var(--text-muted);">No items in this category.</div>`;
+            return;
+        }
+
+        filteredItems.forEach(item => {
+            const finalPrice = getAdjustedPrice(item.id, item.basePrice);
+            const originalPriceHTML = finalPrice !== item.basePrice ? `<span>Rs. ${item.basePrice}</span>` : '';
+            
+            const card = document.createElement('div');
+            card.className = 'menu-card';
+            card.innerHTML = `
+                <div class="menu-card-img">
+                    <img src="${item.image}" alt="${item.title}" onerror="this.src='assets/coffee.jpg'">
+                    <span class="menu-card-badge">${item.category}</span>
+                </div>
+                <div class="menu-card-body">
+                    <h3 class="menu-card-title">${item.title}</h3>
+                    <p class="menu-card-desc">${item.desc}</p>
+                    <div class="menu-card-footer">
+                        <span class="menu-card-price">${originalPriceHTML}Rs. ${finalPrice}</span>
+                        <button class="btn add-to-cart-btn" data-id="${item.id}">
+                            <i class="fa-solid fa-plus"></i> Add
+                        </button>
+                    </div>
+                </div>
+            `;
+            menuGrid.appendChild(card);
+        });
+
+        // Add event listeners to the Add to Cart buttons
+        document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const id = btn.getAttribute('data-id');
+                addToCart(id);
+            });
+        });
+    }
+
+    // Category Selector
+    categoryTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            categoryTabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            activeCategory = tab.getAttribute('data-category');
+            renderMenu();
+        });
+    });
+
+    // --- CART SYSTEM ---
+    function updateCartBadge() {
+        const totalQty = cart.reduce((total, item) => total + item.quantity, 0);
+        if (totalQty > 0) {
+            cartBadge.textContent = totalQty;
+            cartBadge.style.display = 'flex';
+        } else {
+            cartBadge.style.display = 'none';
+        }
+    }
+
+    function addToCart(itemId) {
+        const item = MENU_ITEMS.find(i => i.id === itemId);
+        if (!item) return;
+
+        const currentPrice = getAdjustedPrice(item.id, item.basePrice);
+        const existingItem = cart.find(c => c.id === itemId);
+
+        if (existingItem) {
+            existingItem.quantity += 1;
+            // Update price in case it has been changed in menu sync
+            existingItem.price = currentPrice;
+        } else {
+            cart.push({
+                id: item.id,
+                title: item.title,
+                price: currentPrice,
+                quantity: 1,
+                image: item.image
+            });
+        }
+
+        localStorage.setItem('ayssh_cart', JSON.stringify(cart));
+        updateCartBadge();
+        renderCart();
+        showToast(`Added ${item.title} to cart.`);
+    }
+
+    function updateCartQty(itemId, change) {
+        const existingItem = cart.find(c => c.id === itemId);
+        if (!existingItem) return;
+
+        existingItem.quantity += change;
+        if (existingItem.quantity <= 0) {
+            cart = cart.filter(c => c.id !== itemId);
+        }
+
+        localStorage.setItem('ayssh_cart', JSON.stringify(cart));
+        updateCartBadge();
+        renderCart();
+    }
+
+    function removeFromCart(itemId) {
+        cart = cart.filter(c => c.id !== itemId);
+        localStorage.setItem('ayssh_cart', JSON.stringify(cart));
+        updateCartBadge();
+        renderCart();
+    }
+
+    function renderCart() {
+        cartItemsContainer.innerHTML = '';
+        let total = 0;
+
+        if (cart.length === 0) {
+            cartItemsContainer.innerHTML = `
+                <div class="empty-cart-msg">
+                    <i class="fa-solid fa-basket-shopping"></i>
+                    <p>Your shopping bag is empty.</p>
+                </div>
+            `;
+            cartTotalVal.textContent = 'Rs. 0';
+            checkoutForm.style.display = 'none';
+            checkoutActionBtn.textContent = 'Proceed to Checkout';
+            return;
+        }
+
+        cart.forEach(item => {
+            const finalPrice = getAdjustedPrice(item.id, item.price);
+            const subtotal = finalPrice * item.quantity;
+            total += subtotal;
+
+            const cartItemEl = document.createElement('div');
+            cartItemEl.className = 'cart-item';
+            cartItemEl.innerHTML = `
+                <div class="cart-item-img">
+                    <img src="${item.image}" alt="${item.title}" onerror="this.src='assets/coffee.jpg'">
+                </div>
+                <div class="cart-item-info">
+                    <div class="cart-item-title">${item.title}</div>
+                    <div class="cart-item-price">Rs. ${finalPrice}</div>
+                    <div class="cart-item-qty">
+                        <button class="qty-btn dec-qty" data-id="${item.id}">-</button>
+                        <span class="qty-val">${item.quantity}</span>
+                        <button class="qty-btn inc-qty" data-id="${item.id}">+</button>
+                    </div>
+                </div>
+                <button class="remove-cart-item" data-id="${item.id}" aria-label="Remove item">
+                    <i class="fa-solid fa-trash-can"></i>
+                </button>
+            `;
+            cartItemsContainer.appendChild(cartItemEl);
+        });
+
+        cartTotalVal.textContent = `Rs. ${total.toLocaleString()}`;
+
+        // Bind events to buttons
+        document.querySelectorAll('.dec-qty').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const id = btn.getAttribute('data-id');
+                updateCartQty(id, -1);
+            });
+        });
+
+        document.querySelectorAll('.inc-qty').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const id = btn.getAttribute('data-id');
+                updateCartQty(id, 1);
+            });
+        });
+
+        document.querySelectorAll('.remove-cart-item').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const id = btn.getAttribute('data-id');
+                removeFromCart(id);
+            });
+        });
+    }
+
+    // --- DRAWER OPEN/CLOSE ---
+    function openDrawer() {
+        cartDrawer.classList.add('open');
+        uiOverlay.classList.add('show');
+        document.body.style.overflow = 'hidden';
+    }
+
+    // Export function to window so we can close from outside if needed
+    window.closeDrawer = function() {
+        cartDrawer.classList.remove('open');
+        uiOverlay.classList.remove('show');
+        document.body.style.overflow = 'auto';
+        
+        // Reset checkout state
+        checkoutForm.style.display = 'none';
+        checkoutActionBtn.textContent = cart.length > 0 ? 'Proceed to Checkout' : 'Cart is Empty';
+    }
+
+    cartTrigger.addEventListener('click', openDrawer);
+    closeCartDrawer.addEventListener('click', window.closeDrawer);
+    uiOverlay.addEventListener('click', window.closeDrawer);
+
+    // --- ORDER CHECKOUT SUBMISSION ---
+    checkoutActionBtn.addEventListener('click', () => {
+        if (cart.length === 0) {
+            showToast("Your cart is empty!");
+            return;
+        }
+
+        const isFormVisible = checkoutForm.style.display === 'block';
+
+        if (!isFormVisible) {
+            // Show details form
+            checkoutForm.style.display = 'block';
+            checkoutActionBtn.textContent = 'Confirm & Place Order';
+            
+            // Scroll to the bottom of the drawer to see checkout form
+            setTimeout(() => {
+                cartDrawer.querySelector('.drawer-body').scrollTo({
+                    top: checkoutForm.offsetTop,
+                    behavior: 'smooth'
+                });
+            }, 100);
+        } else {
+            // Submit the order
+            const customerName = document.getElementById('checkoutName').value.trim();
+            const customerPhone = document.getElementById('checkoutPhone').value.trim();
+            const deliveryType = document.getElementById('checkoutDelivery').value;
+
+            if (!customerName || !customerPhone) {
+                showToast("Please fill in your name and phone number!");
+                return;
+            }
+
+            // Create Order
+            let nextOrderNum = parseInt(localStorage.getItem('ayssh_order_counter') || '0') + 1;
+            localStorage.setItem('ayssh_order_counter', nextOrderNum.toString());
+
+            const orderId = "ORD-" + String(nextOrderNum).padStart(4, '0');
+            const total = cart.reduce((sum, item) => sum + (getAdjustedPrice(item.id, item.price) * item.quantity), 0);
+            const itemsArray = cart.map(item => ({
+                name: item.title,
+                quantity: item.quantity
+            }));
+
+            const order = {
+                id: orderId,
+                name: customerName,
+                phone: customerPhone,
+                deliveryType: deliveryType,
+                items: itemsArray,
+                total: total,
+                status: "Processing",
+                timestamp: new Date().toISOString()
+            };
+
+            // 1. Save to global orders in localStorage
+            const allOrders = JSON.parse(localStorage.getItem('ayssh_orders') || '[]');
+            allOrders.push(order);
+            localStorage.setItem('ayssh_orders', JSON.stringify(allOrders));
+
+            // 2. Keep track of user details locally
+            localStorage.setItem('ayssh_last_phone', customerPhone);
+
+            // 3. Write to Firestore if configured
+            if (db) {
+                db.collection('orders').doc(orderId).set(order)
+                    .then(() => console.log("Order saved to Firestore successfully"))
+                    .catch(err => console.error("Error saving order to Firestore:", err));
+            }
+
+            // Clear Cart
+            cart = [];
+            localStorage.removeItem('ayssh_cart');
+            updateCartBadge();
+            renderCart();
+            
+            // Close drawer
+            window.closeDrawer();
+            
+            // Show toast & switch to tracking
+            showToast(`Order Placed successfully! Code: ${orderId}`);
+            
+            // Auto scroll to tracking section and query this order
+            document.getElementById('trackingSearchInput').value = orderId;
+            scrollToSection('track');
+            performTrackingSearch(orderId);
+        }
+    });
+
+    // --- TABLE BOOKING SUBMISSION ---
+    reservationForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        const reserveName = document.getElementById('reserveName').value.trim();
+        const reservePhone = document.getElementById('reservePhone').value.trim();
+        const reserveGuests = document.getElementById('reserveGuests').value;
+        const reserveTable = document.getElementById('reserveTable').value;
+        const reserveDate = document.getElementById('reserveDate').value;
+        const reserveTime = document.getElementById('reserveTime').value;
+
+        if (!reserveName || !reservePhone || !reserveDate) {
+            showToast("Please fill out all reservation fields!");
+            return;
+        }
+
+        // Create Booking
+        let nextBookingNum = parseInt(localStorage.getItem('ayssh_booking_counter') || '0') + 1;
+        localStorage.setItem('ayssh_booking_counter', nextBookingNum.toString());
+
+        const bookingId = "BK-" + String(nextBookingNum).padStart(4, '0');
+
+        const booking = {
+            id: bookingId,
+            name: reserveName,
+            phone: reservePhone,
+            guests: parseInt(reserveGuests),
+            table: reserveTable,
+            date: reserveDate,
+            time: reserveTime,
+            timestamp: new Date().toISOString()
+        };
+
+        // 1. Save to global bookings in localStorage
+        const allBookings = JSON.parse(localStorage.getItem('ayssh_bookings') || '[]');
+        allBookings.push(booking);
+        localStorage.setItem('ayssh_bookings', JSON.stringify(allBookings));
+
+        // Keep track of user details locally
+        localStorage.setItem('ayssh_last_phone', reservePhone);
+
+        // 3. Write to Firestore if configured
+        if (db) {
+            db.collection('bookings').doc(bookingId).set(booking)
+                .then(() => console.log("Booking saved to Firestore successfully"))
+                .catch(err => console.error("Error saving booking to Firestore:", err));
+        }
+
+        // Reset reservation form
+        reservationForm.reset();
+        
+        // Show success Toast & display in tracking
+        showToast(`Table reserved successfully! Code: ${bookingId}`);
+
+        // Scroll to tracking and search
+        document.getElementById('trackingSearchInput').value = bookingId;
+        scrollToSection('track');
+        performTrackingSearch(bookingId);
+    });
+
+    // --- TRACKING AND STATUS CHECK SYSTEM ---
+    const trackingSearchInput = document.getElementById('trackingSearchInput');
+    const trackingSearchBtn = document.getElementById('trackingSearchBtn');
+    const trackingDashboard = document.getElementById('trackingDashboard');
+
+    // Auto-load last searched phone number/data if exist
+    const lastPhone = localStorage.getItem('ayssh_last_phone');
+    if (lastPhone) {
+        trackingSearchInput.value = lastPhone;
+        performTrackingSearch(lastPhone);
+    }
+
+    trackingSearchBtn.addEventListener('click', () => {
+        const query = trackingSearchInput.value.trim();
+        if (!query) {
+            showToast("Please enter a phone number or ID.");
+            return;
+        }
+        performTrackingSearch(query);
+    });
+
+    trackingSearchInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            const query = trackingSearchInput.value.trim();
+            if (query) performTrackingSearch(query);
+        }
+    });
+
+    // Refresh layout automatically when snapshot listeners change
+    function refreshTrackingDashboard() {
+        const query = trackingSearchInput.value.trim();
+        if (query) {
+            renderTrackingResults(query);
+        }
+    }
+
+    function performTrackingSearch(query) {
+        renderTrackingResults(query);
+    }
+
+    function renderTrackingResults(query) {
+        trackingDashboard.innerHTML = '';
+        const lowercaseQuery = query.toLowerCase();
+
+        // Load all database records
+        const allOrders = JSON.parse(localStorage.getItem('ayssh_orders') || '[]');
+        const allBookings = JSON.parse(localStorage.getItem('ayssh_bookings') || '[]');
+
+        // Filter matches (matches phone exactly or matches ID)
+        const matchedOrders = allOrders.filter(o => {
+            return o.id.toLowerCase() === lowercaseQuery || o.phone === query;
+        });
+
+        const matchedBookings = allBookings.filter(b => {
+            return b.id.toLowerCase() === lowercaseQuery || b.phone === query;
+        });
+
+        if (matchedOrders.length === 0 && matchedBookings.length === 0) {
+            trackingDashboard.innerHTML = `
+                <div class="empty-cart-msg" style="padding: 40px 0; background: var(--bg-tertiary); border: 1px dashed var(--border-color); border-radius: 12px; grid-column: 1/-1;">
+                    <i class="fa-solid fa-magnifying-glass-minus"></i>
+                    <p>No active orders or reservations found for "${query}".</p>
+                    <span style="font-size:0.8rem; color: var(--text-muted); display:block; margin-top:10px;">Double-check your input or try placing an order first.</span>
+                </div>
+            `;
+            return;
+        }
+
+        // Render matched orders
+        matchedOrders.sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
+        matchedOrders.forEach(order => {
+            const orderDateStr = new Date(order.timestamp).toLocaleDateString('en-US', {
+                month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+            });
+
+            const itemsSummary = Array.isArray(order.items)
+                ? order.items.map(it => `${it.name} (x${it.quantity})`).join(', ')
+                : order.items;
+
+            // Map status to progress bar details
+            let progressWidth = '0%';
+            let stepProcessingClass = 'step-node completed';
+            let stepPreparingClass = 'step-node';
+            let stepDispatchingClass = 'step-node';
+            let stepCompletedClass = 'step-node';
+
+            const status = order.status || 'Processing';
+
+            if (status === 'Processing') {
+                progressWidth = '10%';
+                stepProcessingClass = 'step-node active';
+            } else if (status === 'Preparing') {
+                progressWidth = '45%';
+                stepProcessingClass = 'step-node completed';
+                stepPreparingClass = 'step-node active';
+            } else if (status === 'Dispatching') {
+                progressWidth = '80%';
+                stepProcessingClass = 'step-node completed';
+                stepPreparingClass = 'step-node completed';
+                stepDispatchingClass = 'step-node active';
+            } else if (status === 'Completed') {
+                progressWidth = '100%';
+                stepProcessingClass = 'step-node completed';
+                stepPreparingClass = 'step-node completed';
+                stepDispatchingClass = 'step-node completed';
+                stepCompletedClass = 'step-node completed';
+            }
+
+            const orderCard = document.createElement('div');
+            orderCard.className = 'history-card';
+            orderCard.innerHTML = `
+                <div class="history-card-header">
+                    <div class="history-card-title">
+                        <i class="fa-solid fa-receipt" style="color: var(--primary); font-size: 1.4rem;"></i>
+                        <h3>Order <span class="history-id">${order.id}</span></h3>
+                    </div>
+                    <span class="history-date">${orderDateStr}</span>
+                </div>
+                
+                <div class="history-card-body">
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <div class="detail-label">Customer Name</div>
+                            <div class="detail-value">${order.name}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Delivery Mode</div>
+                            <div class="detail-value">${order.deliveryType}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Items Summary</div>
+                            <div class="detail-value">${itemsSummary}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Total Amount</div>
+                            <div class="detail-value" style="color: var(--primary); font-size: 1.15rem;">Rs. ${order.total.toLocaleString()}</div>
+                        </div>
+                    </div>
+
+                    <!-- Progress Stepper -->
+                    <div class="progress-stepper">
+                        <div class="progress-line" style="width: ${progressWidth};"></div>
+                        <div class="${stepProcessingClass}">
+                            <div class="step-circle"><i class="fa-solid fa-receipt"></i></div>
+                            <div class="step-label">Received</div>
+                        </div>
+                        <div class="${stepPreparingClass}">
+                            <div class="step-circle"><i class="fa-solid fa-fire-burner"></i></div>
+                            <div class="step-label">Kitchen</div>
+                        </div>
+                        <div class="${stepDispatchingClass}">
+                            <div class="step-circle"><i class="fa-solid fa-truck-ramp-box"></i></div>
+                            <div class="step-label">Ready / Way</div>
+                        </div>
+                        <div class="${stepCompletedClass}">
+                            <div class="step-circle"><i class="fa-solid fa-circle-check"></i></div>
+                            <div class="step-label">Completed</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            trackingDashboard.appendChild(orderCard);
+        });
+
+        // Render matched bookings
+        matchedBookings.sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
+        matchedBookings.forEach(booking => {
+            const bookingDateStr = new Date(booking.timestamp).toLocaleDateString('en-US', {
+                month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+            });
+
+            const bookingCard = document.createElement('div');
+            bookingCard.className = 'history-card';
+            // Use different border indicator left color for booking
+            bookingCard.style.borderColor = 'rgba(201, 160, 84, 0.4)';
+            
+            bookingCard.innerHTML = `
+                <div class="history-card-header">
+                    <div class="history-card-title">
+                        <i class="fa-solid fa-calendar-check" style="color: var(--primary); font-size: 1.4rem;"></i>
+                        <h3>Table Booking <span class="history-id">${booking.id}</span></h3>
+                    </div>
+                    <span class="history-date">${bookingDateStr}</span>
+                </div>
+                
+                <div class="history-card-body">
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <div class="detail-label">Guest Name</div>
+                            <div class="detail-value">${booking.name}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Party Size</div>
+                            <div class="detail-value">${booking.guests} Guests</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Table Layout</div>
+                            <div class="detail-value">${booking.table}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Reserved Date & Slot</div>
+                            <div class="detail-value">${booking.date} (${booking.time})</div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 25px; display:flex; justify-content:flex-end;">
+                        <button class="btn btn-secondary cancel-booking-btn" data-id="${booking.id}" style="padding: 8px 18px; font-size: 0.8rem; border-color: rgba(231, 76, 60, 0.4); color: #e74c3c;">
+                            <i class="fa-solid fa-xmark"></i> Cancel Reservation
+                        </button>
+                    </div>
+                </div>
+            `;
+            trackingDashboard.appendChild(bookingCard);
+        });
+
+        // Bind cancel buttons
+        document.querySelectorAll('.cancel-booking-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const id = btn.getAttribute('data-id');
+                cancelReservation(id);
+            });
+        });
+    }
+
+    // Cancellation Handler
+    function cancelReservation(id) {
+        if (confirm(`Are you sure you want to cancel reservation ${id}?`)) {
+            // Delete reservation in local storage
+            let allBookings = JSON.parse(localStorage.getItem('ayssh_bookings') || '[]');
+            allBookings = allBookings.filter(b => b.id !== id);
+            localStorage.setItem('ayssh_bookings', JSON.stringify(allBookings));
+
+            // Sync with Firestore
+            if (db) {
+                db.collection('bookings').doc(id).delete()
+                    .then(() => console.log(`Reservation ${id} deleted from Firestore`))
+                    .catch(err => console.error("Error deleting reservation from Firestore:", err));
+            }
+
+            showToast(`Reservation ${id} successfully cancelled.`);
+            refreshTrackingDashboard();
+        }
+    }
+
+    // --- HELPER TOAST NOTIFICATION ---
+    function showToast(message) {
+        const toast = document.getElementById('customToast');
+        const toastMsg = document.getElementById('toastMsg');
+        
+        toastMsg.textContent = message;
+        toast.classList.add('show');
+        
+        setTimeout(() => {
+            toast.classList.remove('show');
+        }, 4000);
+    }
+
+    // --- INITIALIZE APPLICATION PAGE ---
+    renderMenu();
+    updateCartBadge();
+    renderCart();
+
+    // Auto set date input range in reservation (starts from today)
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('reserveDate').setAttribute('min', today);
 });
-
-

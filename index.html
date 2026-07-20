@@ -3,834 +3,244 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ayssh Cafe - Premium Coffee, Cakes & Biscuits</title>
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap" rel="stylesheet">
-    <!-- Font Awesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Ayssh Cafe | Premium Coffee & Artisanal Pastries</title>
+    <meta name="description" content="Experience premium handcrafted coffees, decadent custom cakes, and freshly baked artisanal cookies in a warm, sophisticated ambiance.">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <!-- Stylesheet -->
-    <link rel="stylesheet" href="styles.css?v=2.0">
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <!-- Scroll Progress Bar -->
-    <div class="scroll-progress-bar" id="scrollProgress"></div>
 
-    <!-- Header -->
-    <header class="header">
+    <!-- Header Section -->
+    <header id="mainHeader">
         <div class="container nav-container">
-            <a href="#" class="logo-brand">
-                <svg class="logo-icon" viewBox="0 0 100 100" width="38" height="38">
-                    <!-- SVG paths for a stylish gold coffee cup with abstract steam waves -->
-                    <path d="M30,42 h40 c4,0 8,3 8,8 v8 c0,9 -7,16 -16,16 h-16 c-9,0 -16,-7 -16,-16 v-8 C22,45 26,42 30,42 z" fill="none" stroke="var(--primary)" stroke-width="4.5" stroke-linecap="round"/>
-                    <path d="M70,49 c3,0 6,3 6,6 v1 c0,3 -3,6 -6,6" fill="none" stroke="var(--primary)" stroke-width="4.5" stroke-linecap="round"/>
-                    <path d="M22,80 h56" fill="none" stroke="var(--primary)" stroke-width="4.5" stroke-linecap="round"/>
-                    <path d="M38,32 c1,-3 -1,-6 0,-9" fill="none" stroke="var(--accent)" stroke-width="3" stroke-linecap="round"/>
-                    <path d="M50,34 c2,-4 -1,-8 1,-12" fill="none" stroke="var(--accent)" stroke-width="3" stroke-linecap="round"/>
-                    <path d="M62,32 c1,-3 -1,-6 0,-9" fill="none" stroke="var(--accent)" stroke-width="3" stroke-linecap="round"/>
-                </svg>
-                <span class="logo-text"><span class="logo-accent">Ayssh</span> Cafe</span>
-            </a>
-            
-            <nav class="nav-menu" id="navMenu">
-                <a href="#home" class="nav-link active">Home</a>
-                <a href="#about" class="nav-link">Our Story</a>
-                <a href="#menu" class="nav-link">Menu</a>
-                <a href="#reservation" class="nav-link">Reservations</a>
-                <a href="#testimonials" class="nav-link">Reviews</a>
-                <a href="#contact" class="nav-link">Contact</a>
-                <a href="#chatbot" class="nav-link">AI Assistant</a>
-            </nav>
-
+            <div class="logo">
+                <i class="fa-solid fa-mug-hot"></i>
+                <div class="logo-text">Ayssh <span>Cafe</span></div>
+            </div>
+            <ul class="nav-menu">
+                <li><span class="nav-link active" data-target="home">Home</span></li>
+                <li><span class="nav-link" data-target="menu">Menu</span></li>
+                <li><span class="nav-link" data-target="book">Book Table</span></li>
+                <li><span class="nav-link" data-target="track">Track Status</span></li>
+            </ul>
             <div class="nav-actions">
-                <button class="cart-btn" id="cartToggle" aria-label="Open Cart">
+                <button class="cart-trigger" id="cartTrigger" aria-label="Open shopping bag">
                     <i class="fa-solid fa-bag-shopping"></i>
-                    <span class="cart-badge" id="cartBadge">0</span>
+                    <span class="cart-badge" id="cartBadge" style="display: none;">0</span>
                 </button>
-                <a href="#reservation" class="btn btn-primary btn-nav">Book Table</a>
-                <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle Menu">
-                    <i class="fa-solid fa-bars"></i>
-                </button>
+                <button class="btn btn-secondary" id="navBookBtn">Book Table</button>
             </div>
         </div>
     </header>
 
-    <!-- Cart Drawer (Frosted Glass Slide-out) -->
-    <div class="cart-drawer" id="cartDrawer">
-        <div class="cart-header">
-            <h3>Your Order</h3>
-            <button class="close-cart" id="closeCart">&times;</button>
-        </div>
-        <div class="cart-items" id="cartItems">
-            <!-- Dynamic Cart Items go here -->
-            <div class="cart-empty-message">
-                <i class="fa-solid fa-mug-hot"></i>
-                <p>Your bag is empty. Add some fresh delights!</p>
-            </div>
-        </div>
-        <div class="cart-footer">
-            <div class="cart-totals">
-                <div class="total-row">
-                    <span>Subtotal</span>
-                    <span id="cartSubtotal">Rs. 0</span>
-                </div>
-                <div class="total-row">
-                    <span>GST (15%)</span>
-                    <span id="cartTax">Rs. 0</span>
-                </div>
-                <div class="total-row grand-total">
-                    <span>Total</span>
-                    <span id="cartTotal">Rs. 0</span>
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="container">
+            <div class="hero-content">
+                <span class="hero-subtitle">Est. 2026</span>
+                <h1>Handcrafted <span>Moments & Flavors</span></h1>
+                <p class="hero-desc">Indulge in our exquisite selection of specialty cappuccino, authentic karak chai, giant cookies, and gorgeous gourmet cakes, baked fresh every single day.</p>
+                <div class="hero-buttons">
+                    <button class="btn" id="heroMenuBtn">Explore Menu</button>
+                    <button class="btn btn-secondary" id="heroBookBtn">Book Table</button>
                 </div>
             </div>
-            <button class="btn btn-primary btn-block" id="checkoutBtn">Place Order</button>
         </div>
-    </div>
-    <div class="cart-overlay" id="cartOverlay"></div>
+    </section>
 
-    <!-- Main Content -->
-    <main>
-        <!-- Hero Section -->
-        <section id="home" class="hero-section">
-            <div class="hero-overlay"></div>
-            <!-- Floating Decorative 3D Elements -->
-            <div class="hero-deco hero-deco-1" data-speed="3"><i class="fa-solid fa-mug-hot"></i></div>
-            <div class="hero-deco hero-deco-2" data-speed="-2.5"><i class="fa-solid fa-cookie-bite"></i></div>
-            <div class="hero-deco hero-deco-3" data-speed="1.8"><i class="fa-solid fa-seedling"></i></div>
-            <div class="hero-deco hero-deco-4" data-speed="-1.2"><i class="fa-solid fa-star"></i></div>
+    <!-- Menu Catalog Section -->
+    <section class="menu-section" id="menu">
+        <div class="container">
+            <h2 class="section-title">Our Gourmet <span>Selection</span></h2>
             
-            <div class="container hero-container">
-                <div class="hero-content">
-                    <span class="hero-subtitle"><i class="fa-solid fa-mug-hot"></i> Premium Artisanal Cafe</span>
-                    <h1 class="hero-title">Where Every Cup Tells a <span class="text-glow">Story</span></h1>
-                    <p class="hero-desc">Indulge in freshly roasted coffees, heavenly moist cakes, and crispy butter biscuits crafted with passion. Experience the perfect blend of warmth and flavor at Ayssh Cafe.</p>
-                    <div class="hero-btns">
-                        <a href="#menu" class="btn btn-primary">Explore Menu</a>
-                        <a href="#reservation" class="btn btn-secondary">Book a Table</a>
-                    </div>
-                </div>
+            <!-- Category Tabs -->
+            <div class="category-tabs">
+                <button class="category-tab active" data-category="All">All Menu Items</button>
+                <button class="category-tab" data-category="Coffee & Tea">Coffee & Aromatic Tea</button>
+                <button class="category-tab" data-category="Decadent Cakes">Decadent Cakes</button>
+                <button class="category-tab" data-category="Artisanal Cookies">Artisanal Cookies</button>
             </div>
-            <div class="scroll-down">
-                <a href="#about" aria-label="Scroll Down">
-                    <i class="fa-solid fa-chevron-down"></i>
-                </a>
+
+            <!-- Products Grid -->
+            <div class="menu-grid" id="menuGrid">
+                <!-- Injected dynamically via app.js -->
             </div>
-        </section>
+        </div>
+    </section>
 
-        <!-- About Section -->
-        <section id="about" class="about-section section-padding reveal">
-            <div class="container">
-                <div class="grid grid-2">
-                    <div class="about-img-container reveal-left">
-                        <div class="about-img-box">
-                            <img src="assets/about_coffee.jpg" alt="Hot Cappuccino Cup" class="about-img main-img">
-                            <div class="img-badge">
-                                <span class="badge-num">100%</span>
-                                <span class="badge-txt">Organic Beans</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="about-content reveal-right">
-                        <span class="section-subtitle">Our Journey</span>
-                        <h2 class="section-title">Brewing Joy & Baking Love Every Single Day</h2>
-                        <p class="section-desc">At Ayssh Cafe, we believe that a great day starts with coffee and ends with desserts. Our beans are sourced ethically from single-origin farms, roasted locally to perfection. Our bakers wake up before dawn to create delicious cakes and crispy, crumbly biscuits that melt in your mouth.</p>
-                        <p class="section-desc">Whether you are looking for a quiet corner to read, a friendly spot to catch up with friends, or simply need your daily caffeine fix, we have created the perfect cozy escape for you.</p>
-                        
-                        <div class="stats-grid">
-                            <div class="stats-card" style="background-color: var(--bg-secondary); border: 1px solid var(--border-color); padding: 20px; border-radius: var(--border-radius-md); text-align: center;">
-                                <h3 style="font-size: 2rem; color: var(--primary); margin-bottom: 6px; font-family: var(--font-heading);">5+</h3>
-                                <p style="color: var(--text-secondary); font-size: 0.85rem; font-weight: 600;">Years of Roast</p>
-                            </div>
-                            <div class="stats-card" style="background-color: var(--bg-secondary); border: 1px solid var(--border-color); padding: 20px; border-radius: var(--border-radius-md); text-align: center;">
-                                <h3 style="font-size: 2rem; color: var(--primary); margin-bottom: 6px; font-family: var(--font-heading);">12+</h3>
-                                <p style="color: var(--text-secondary); font-size: 0.85rem; font-weight: 600;">Coffee Blends</p>
-                            </div>
-                            <div class="stats-card" style="background-color: var(--bg-secondary); border: 1px solid var(--border-color); padding: 20px; border-radius: var(--border-radius-md); text-align: center;">
-                                <h3 style="font-size: 2rem; color: var(--primary); margin-bottom: 6px; font-family: var(--font-heading);">20+</h3>
-                                <p style="color: var(--text-secondary); font-size: 0.85rem; font-weight: 600;">Fresh Cakes & Cookies</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Menu Section -->
-        <section id="menu" class="menu-section section-padding reveal">
-            <div class="container">
-                <div class="section-header text-center reveal">
-                    <span class="section-subtitle">Delights of Ayssh</span>
-                    <h2 class="section-title">Explore Our Specialty Menu</h2>
-                    <p class="header-desc">Freshly brewed, freshly baked, and made to order. Choose your favorite espresso, decadent cakes, and artisanal biscuits.</p>
-                </div>
-
-                <!-- Menu Filters -->
-                <div class="menu-filters">
-                    <button class="filter-btn active" data-filter="all">All Items</button>
-                    <button class="filter-btn" data-filter="coffee">Coffee & Teas</button>
-                    <button class="filter-btn" data-filter="cakes">Cakes & Pastries</button>
-                    <button class="filter-btn" data-filter="biscuits">Biscuits & Cookies</button>
-                </div>
-
-                <!-- Menu Grid -->
-                <div class="menu-grid" id="menuGrid">
-                    <!-- Coffee Items -->
-                    <div class="menu-card reveal" data-category="coffee">
-                        <div class="menu-img-wrapper">
-                            <img src="assets/coffee.jpg" alt="Premium Cappuccino" class="menu-img">
-                            <span class="menu-badge best">Best Seller</span>
-                        </div>
-                        <div class="menu-info">
-                            <div class="menu-meta">
-                                <h3 class="menu-item-title">Premium Cappuccino</h3>
-                                <span class="menu-item-price">Rs. 450</span>
-                            </div>
-                            <p class="menu-item-desc">Double espresso shot topped with a velvety layer of steamed milk foam, decorated with unique latte art.</p>
-                            <button class="btn btn-outline btn-sm add-to-cart-btn" data-id="1" data-name="Premium Cappuccino" data-price="450">Add to Order</button>
-                        </div>
-                    </div>
-
-                    <div class="menu-card reveal" data-category="coffee">
-                        <div class="menu-img-wrapper">
-                            <img src="assets/karak_chai.jpg" alt="Traditional Karak Chai" class="menu-img">
-                            <span class="menu-badge special">Popular</span>
-                        </div>
-                        <div class="menu-info">
-                            <div class="menu-meta">
-                                <h3 class="menu-item-title">Traditional Karak Chai</h3>
-                                <span class="menu-item-price">Rs. 250</span>
-                            </div>
-                            <p class="menu-item-desc">Strong black tea slow-brewed with cardamom, saffron, and condensed milk for a rich, aromatic experience.</p>
-                            <button class="btn btn-outline btn-sm add-to-cart-btn" data-id="2" data-name="Traditional Karak Chai" data-price="250">Add to Order</button>
-                        </div>
-                    </div>
-
-                    <div class="menu-card reveal" data-category="coffee">
-                        <div class="menu-img-wrapper">
-                            <img src="assets/caramel_macchiato.jpg" alt="Caramel Macchiato" class="menu-img">
-                        </div>
-                        <div class="menu-info">
-                            <div class="menu-meta">
-                                <h3 class="menu-item-title">Caramel Macchiato</h3>
-                                <span class="menu-item-price">Rs. 550</span>
-                            </div>
-                            <p class="menu-item-desc">Freshly steamed milk with vanilla-flavored syrup, marked with espresso and drizzled with decadent caramel sauce.</p>
-                            <button class="btn btn-outline btn-sm add-to-cart-btn" data-id="3" data-name="Caramel Macchiato" data-price="550">Add to Order</button>
-                        </div>
-                    </div>
-
-                    <!-- Cakes Items -->
-                    <div class="menu-card reveal" data-category="cakes">
-                        <div class="menu-img-wrapper">
-                            <img src="assets/cake.jpg" alt="Chocolate Fudge Truffle Cake" class="menu-img">
-                            <span class="menu-badge best">Best Seller</span>
-                        </div>
-                        <div class="menu-info">
-                            <div class="menu-meta">
-                                <h3 class="menu-item-title">Chocolate Fudge Truffle</h3>
-                                <span class="menu-item-price">Rs. 950</span>
-                            </div>
-                            <p class="menu-item-desc">Layers of rich dark chocolate sponge cake, sandwiched with silky dark chocolate ganache and chocolate truffle chips.</p>
-                            <button class="btn btn-outline btn-sm add-to-cart-btn" data-id="4" data-name="Chocolate Fudge Truffle" data-price="950">Add to Order</button>
-                        </div>
-                    </div>
-
-                    <div class="menu-card reveal" data-category="cakes">
-                        <div class="menu-img-wrapper">
-                            <img src="assets/rose_cake.jpg" alt="Velvet Rose Cake" class="menu-img">
-                            <span class="menu-badge special">Signature</span>
-                        </div>
-                        <div class="menu-info">
-                            <div class="menu-meta">
-                                <h3 class="menu-item-title">Velvet Rose Cake</h3>
-                                <span class="menu-item-price">Rs. 1200</span>
-                            </div>
-                            <p class="menu-item-desc">Light and moist sponge flavored with a delicate hint of organic rose water, layered with premium cream cheese frosting.</p>
-                            <button class="btn btn-outline btn-sm add-to-cart-btn" data-id="5" data-name="Velvet Rose Cake" data-price="1200">Add to Order</button>
-                        </div>
-                    </div>
-
-                    <div class="menu-card reveal" data-category="cakes">
-                        <div class="menu-img-wrapper">
-                            <img src="assets/lemon_cake.jpg" alt="Lemon Drizzle Cake" class="menu-img">
-                        </div>
-                        <div class="menu-info">
-                            <div class="menu-meta">
-                                <h3 class="menu-item-title">Lemon Drizzle Cake</h3>
-                                <span class="menu-item-price">Rs. 850</span>
-                            </div>
-                            <p class="menu-item-desc">Zesty, moist, and tangy lemon sponge cake soaked in fresh lemon juice syrup, finished with a sweet sugar glaze.</p>
-                            <button class="btn btn-outline btn-sm add-to-cart-btn" data-id="6" data-name="Lemon Drizzle Cake" data-price="850">Add to Order</button>
-                        </div>
-                    </div>
-
-                    <!-- Biscuits Items -->
-                    <div class="menu-card reveal" data-category="biscuits">
-                        <div class="menu-img-wrapper">
-                            <img src="assets/cookies.jpg" alt="Choco-Chip Giant Cookie" class="menu-img">
-                            <span class="menu-badge best">Warm & Fresh</span>
-                        </div>
-                        <div class="menu-info">
-                            <div class="menu-meta">
-                                <h3 class="menu-item-title">Choco-Chip Giant Cookie</h3>
-                                <span class="menu-item-price">Rs. 180</span>
-                            </div>
-                            <p class="menu-item-desc">Soft-baked, giant cookie loaded with melted Belgian dark chocolate chunks. Served warm from the oven.</p>
-                            <button class="btn btn-outline btn-sm add-to-cart-btn" data-id="7" data-name="Choco-Chip Giant Cookie" data-price="180">Add to Order</button>
-                        </div>
-                    </div>
-
-                    <div class="menu-card reveal" data-category="biscuits">
-                        <div class="menu-img-wrapper">
-                            <img src="assets/almond_biscotti.jpg" alt="Butter Almond Biscotti" class="menu-img">
-                        </div>
-                        <div class="menu-info">
-                            <div class="menu-meta">
-                                <h3 class="menu-item-title">Butter Almond Biscotti</h3>
-                                <span class="menu-item-price">Rs. 220</span>
-                            </div>
-                            <p class="menu-item-desc">Classic Italian twice-baked almond biscuits, crunchy and perfect for dipping into your hot tea or cappuccino.</p>
-                            <button class="btn btn-outline btn-sm add-to-cart-btn" data-id="8" data-name="Butter Almond Biscotti" data-price="220">Add to Order</button>
-                        </div>
-                    </div>
-
-                    <div class="menu-card reveal" data-category="biscuits">
-                        <div class="menu-img-wrapper">
-                            <img src="assets/coconut_biscuits.jpg" alt="Coconut Crunch Biscuits" class="menu-img">
-                            <span class="menu-badge special">Crispy</span>
-                        </div>
-                        <div class="menu-info">
-                            <div class="menu-meta">
-                                <h3 class="menu-item-title">Coconut Crunch Biscuits</h3>
-                                <span class="menu-item-price">Rs. 150</span>
-                            </div>
-                            <p class="menu-item-desc">Crispy and light butter biscuits baked with toasted coconut flakes, giving a delicious crunch in every bite. (Pack of 3)</p>
-                            <button class="btn btn-outline btn-sm add-to-cart-btn" data-id="9" data-name="Coconut Crunch Biscuits" data-price="150">Add to Order</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Reservation Section -->
-        <section id="reservation" class="reservation-section section-padding reveal">
-            <div class="container">
-                <div class="grid grid-2 align-center">
-                    <div class="reservation-content reveal-left">
-                        <span class="section-subtitle">Make a Reservation</span>
-                        <h2 class="section-title">Reserve Your Cozy Corner</h2>
-                        <p class="section-desc">Planning a study session, a coffee date, or a weekend brunch? Book your table in advance and skip the line. Select your preferred area and time, and we'll have your spot waiting with freshly brewed coffee.</p>
-                        
-                        <div class="reservation-details">
-                            <div class="res-item">
-                                <i class="fa-solid fa-phone"></i>
-                                <div>
-                                    <h4>Call Us for Custom Parties</h4>
-                                    <p>+92 21 3456789</p>
-                                </div>
-                            </div>
-                            <div class="res-item">
-                                <i class="fa-solid fa-envelope"></i>
-                                <div>
-                                    <h4>Corporate Events & Bookings</h4>
-                                    <p>events@aysshcafe.com</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="reservation-form-container reveal-right">
-                        <form class="reservation-form" id="resForm">
-                            <h3>Book a Table</h3>
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label for="resName">Full Name</label>
-                                    <input type="text" id="resName" required placeholder="John Doe">
-                                </div>
-                                <div class="form-group">
-                                    <label for="resPhone">Phone Number</label>
-                                    <input type="tel" id="resPhone" required placeholder="e.g. 0300-1234567">
-                                </div>
-                            </div>
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label for="resGuests">Number of Guests</label>
-                                    <select id="resGuests" required>
-                                        <option value="1">1 Person</option>
-                                        <option value="2" selected>2 People</option>
-                                        <option value="3">3 People</option>
-                                        <option value="4">4 People</option>
-                                        <option value="5">5 People</option>
-                                        <option value="6">6+ People (Group)</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label for="resTable">Table Preference</label>
-                                    <select id="resTable" required>
-                                        <option value="Cozy Booth">Cozy Booth (Quiet)</option>
-                                        <option value="Window Side" selected>Window Side (Street view)</option>
-                                        <option value="Sunlit Garden">Outdoor Garden (Fresh Air)</option>
-                                        <option value="No Preference">No Preference</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label for="resDate">Select Date</label>
-                                    <input type="date" id="resDate" required>
-                                </div>
-                                <div class="form-group">
-                                    <label for="resTime">Select Time Slot</label>
-                                    <select id="resTime" required>
-                                        <option value="08:00 AM">08:00 AM - Morning Brew</option>
-                                        <option value="10:30 AM">10:30 AM - Brunch</option>
-                                        <option value="01:00 PM">01:00 PM - Afternoon Tea</option>
-                                        <option value="04:00 PM">04:00 PM - Late Coffee</option>
-                                        <option value="07:00 PM">07:00 PM - Cozy Evening</option>
-                                        <option value="09:00 PM">09:00 PM - Late Dessert</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <button type="submit" class="btn btn-primary btn-block">Confirm Reservation</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Testimonials Section -->
-        <section id="testimonials" class="testimonials-section section-padding reveal">
-            <div class="container">
-                <div class="section-header text-center reveal">
-                    <span class="section-subtitle">Guest Reviews</span>
-                    <h2 class="section-title">What Coffee Lovers Say</h2>
-                    <p class="header-desc">Read about real experiences from our daily guests and sweet tooth lovers.</p>
+    <!-- Table Reservation Section -->
+    <section class="reservation-section" id="book">
+        <div class="container">
+            <div class="reservation-grid">
+                <div class="reservation-info">
+                    <h2 class="section-title" style="text-align: left;">Reserve A <span>Table</span></h2>
+                    <p>Escape into a serene sensory environment. Save a cozy spot ahead of time for your workspace requirements, romantic dates, or high-tea business gatherings.</p>
+                    <ul class="features-list">
+                        <li><i class="fa-solid fa-circle-check"></i> High-speed complementary fiber Wi-Fi</li>
+                        <li><i class="fa-solid fa-circle-check"></i> Premium window view options available</li>
+                        <li><i class="fa-solid fa-circle-check"></i> Free charging ports at every layout table</li>
+                        <li><i class="fa-solid fa-circle-check"></i> Personalized chef attention on request</li>
+                    </ul>
                 </div>
                 
-                <div class="slider-wrapper reveal">
-                    <div class="testimonials-slider" id="testimonialsSlider">
-                        <div class="testimonial-card active">
-                            <div class="stars">
-                                <i class="fa-solid fa-star"></i>
-                                <i class="fa-solid fa-star"></i>
-                                <i class="fa-solid fa-star"></i>
-                                <i class="fa-solid fa-star"></i>
-                                <i class="fa-solid fa-star"></i>
-                            </div>
-                            <p class="quote">"Ayssh Cafe is my absolute happy place. Their Chocolate Fudge Truffle cake is incredibly moist and decadent, and it goes beautifully with the Karak Chai. The ambiance is warm and the service is always friendly."</p>
-                            <div class="user-info">
-                                <div class="user-details">
-                                    <h4>Ayesha Khan</h4>
-                                    <span>Regular Customer</span>
-                                </div>
-                            </div>
+                <div class="card-form">
+                    <form id="reservationForm">
+                        <div class="form-group">
+                            <label class="form-label" for="reserveName">Guest Name</label>
+                            <input type="text" id="reserveName" required class="form-control" placeholder="Enter your full name">
                         </div>
-
-                        <div class="testimonial-card">
-                            <div class="stars">
-                                <i class="fa-solid fa-star"></i>
-                                <i class="fa-solid fa-star"></i>
-                                <i class="fa-solid fa-star"></i>
-                                <i class="fa-solid fa-star"></i>
-                                <i class="fa-solid fa-star"></i>
-                            </div>
-                            <p class="quote">"The Almond Biscotti here is baked to crunchy perfection! I love dunking it in my Cappuccino. It's the best cafe in the city for studying or getting some work done. The dark warm aesthetic is gorgeous."</p>
-                            <div class="user-info">
-                                <div class="user-details">
-                                    <h4>Zain Malik</h4>
-                                    <span>Writer & Coffee Nerd</span>
-                                </div>
-                            </div>
+                        <div class="form-group">
+                            <label class="form-label" for="reservePhone">Phone Number</label>
+                            <input type="tel" id="reservePhone" required class="form-control" placeholder="e.g., 03001234567">
                         </div>
-
-                        <div class="testimonial-card">
-                            <div class="stars">
-                                <i class="fa-solid fa-star"></i>
-                                <i class="fa-solid fa-star"></i>
-                                <i class="fa-solid fa-star"></i>
-                                <i class="fa-solid fa-star"></i>
-                                <i class="fa-solid fa-star-half-stroke"></i>
-                            </div>
-                            <p class="quote">"Unbelievable cookies! The giant choco-chip cookies are served warm and gooey. I also booked a booth table for a team meeting and the reservation process was completely seamless. Highly recommended!"</p>
-                            <div class="user-info">
-                                <div class="user-details">
-                                    <h4>Sarah Ahmed</h4>
-                                    <span>Tech Lead</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="slider-dots" id="sliderDots">
-                        <span class="dot active" data-index="0"></span>
-                        <span class="dot" data-index="1"></span>
-                        <span class="dot" data-index="2"></span>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Contact Section -->
-        <section id="contact" class="contact-section section-padding reveal">
-            <div class="container">
-                <div class="grid grid-2">
-                    <div class="contact-info reveal-left">
-                        <span class="section-subtitle">Visit Us</span>
-                        <h2 class="section-title">We'd Love to Host You</h2>
-                        <p class="section-desc">Drop by to grab a quick coffee on the go, or sit down and stay a while. We are situated in a quiet, beautiful corner of the downtown area.</p>
                         
-                        <div class="contact-methods">
-                            <div class="contact-card">
-                                <i class="fa-solid fa-location-dot"></i>
-                                <div>
-                                    <h4>Location</h4>
-                                    <p>102 Cocoa Bean Boulevard, Coffee District, Clifton, Karachi</p>
-                                </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label" for="reserveGuests">Party Size</label>
+                                <select id="reserveGuests" class="form-control">
+                                    <option value="1">1 Guest</option>
+                                    <option value="2" selected>2 Guests</option>
+                                    <option value="4">4 Guests</option>
+                                    <option value="6">6 Guests</option>
+                                    <option value="8">8 Guests</option>
+                                    <option value="10">10+ Guests</option>
+                                </select>
                             </div>
-                            
-                            <div class="contact-card">
-                                <i class="fa-solid fa-clock"></i>
-                                <div>
-                                    <h4>Opening Hours</h4>
-                                    <p>Monday - Friday: 7:00 AM - 10:00 PM</p>
-                                    <p>Saturday - Sunday: 8:00 AM - 11:00 PM</p>
-                                </div>
-                            </div>
-
-                            <div class="contact-card">
-                                <i class="fa-solid fa-phone"></i>
-                                <div>
-                                    <h4>Get in Touch</h4>
-                                    <p>Phone: +92 21 3456789</p>
-                                    <p>Email: hello@aysshcafe.com</p>
-                                </div>
+                            <div class="form-group">
+                                <label class="form-label" for="reserveTable">Table Layout</label>
+                                <select id="reserveTable" class="form-control">
+                                    <option value="Standard Sitting">Standard Sitting</option>
+                                    <option value="Window View">Window View (Premium)</option>
+                                    <option value="Cozy Corner">Cozy Corner</option>
+                                    <option value="Outdoor Lounge">Outdoor Lounge</option>
+                                </select>
                             </div>
                         </div>
-                    </div>
 
-                    <div class="map-container reveal-right">
-                        <!-- Custom CSS Animated Mock Map -->
-                        <div class="mock-map">
-                            <div class="map-grid"></div>
-                            <div class="map-pulse"></div>
-                            <div class="map-pin">
-                                <i class="fa-solid fa-location-pin"></i>
-                                <span class="pin-popup">Ayssh Cafe is Here!</span>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label" for="reserveDate">Reservation Date</label>
+                                <input type="date" id="reserveDate" required class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="reserveTime">Time Slot</label>
+                                <select id="reserveTime" class="form-control">
+                                    <option value="Afternoon (12:00 PM - 3:00 PM)">Afternoon (12pm - 3pm)</option>
+                                    <option value="High Tea (3:00 PM - 6:00 PM)">High Tea (3pm - 6pm)</option>
+                                    <option value="Dinner (6:00 PM - 9:00 PM)">Dinner (6pm - 9pm)</option>
+                                    <option value="Late Night (9:00 PM - 12:00 AM)">Late Night (9pm - 12am)</option>
+                                </select>
                             </div>
                         </div>
-                    </div>
-                </div>
-            </div>
-        </section>
 
-        <!-- Section: Dedicated AI Chatbot Page -->
-        <section id="chatbot" style="display: none; padding: 120px 20px 80px;">
-            <div class="container" style="max-width: 800px; margin: 0 auto;">
-                <div class="section-header reveal active" style="text-align: center; margin-bottom: 40px;">
-                    <span class="sub-title">Ayssh Cafe Assistant</span>
-                    <h2 class="section-title">Chat with our AI Host</h2>
-                    <p style="color: var(--text-muted); font-size: 0.95rem; margin-top: 10px;">
-                        Have questions about our menus, reservation timings, specials, or directions? Ask our premium AI chatbot helper!
-                    </p>
-                </div>
-
-                <div class="page-chat-container">
-                    <div class="page-chat-header">
-                        <div class="page-chat-info">
-                            <div class="page-chat-status-dot"></div>
-                            <div>
-                                <h3 style="font-family: var(--font-heading); color: var(--text-primary); font-size: 1.1rem; font-weight: 700; margin: 0;">Ayssh Cafe AI Host</h3>
-                                <span style="font-size: 0.75rem; color: var(--primary); font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase;">Powered by Groq LPU</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="page-chat-feed" id="pageChatFeed">
-                        <!-- Welcoming messages -->
-                        <div class="page-chat-msg bot">
-                            <div class="page-chat-bubble">
-                                Hi there! Welcome to Ayssh Cafe. ☕ How can I help you today?
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="page-chat-prompts">
-                        <button class="page-prompt-chip" data-prompt="timings">🕒 Hours</button>
-                        <button class="page-prompt-chip" data-prompt="location">📍 Location</button>
-                        <button class="page-prompt-chip" data-prompt="book">📅 Book Table</button>
-                        <button class="page-prompt-chip" data-prompt="specials">✨ Specials</button>
-                    </div>
-
-                    <form id="pageChatForm" class="page-chat-input-area">
-                        <input type="text" id="pageChatInput" placeholder="Ask anything about Ayssh Cafe..." autocomplete="off" required>
-                        <button type="submit" class="page-chat-send-btn">
-                            Send <i class="fa-solid fa-paper-plane" style="margin-left: 6px;"></i>
+                        <button type="submit" class="btn" style="width: 100%; justify-content: center; margin-top: 10px;">
+                            <i class="fa-solid fa-calendar-check"></i> Book My Table
                         </button>
                     </form>
                 </div>
             </div>
-        </section>
-    </main>
+        </div>
+    </section>
 
-    <!-- Reservation Ticket Modal -->
-    <div class="modal" id="ticketModal">
-        <div class="modal-content ticket-card">
-            <div class="ticket-header">
-                <h3>Ayssh Cafe</h3>
-                <p>Booking Confirmed</p>
+    <!-- Tracking Dashboard Section -->
+    <section class="tracking-section" id="track">
+        <div class="container">
+            <h2 class="section-title">Track Order & <span>Reservations</span></h2>
+            
+            <!-- Lookup search panel -->
+            <div class="tracking-search-box">
+                <input type="text" id="trackingSearchInput" class="form-control" placeholder="Enter your Phone Number or Order/Booking ID...">
+                <button class="btn" id="trackingSearchBtn">
+                    <i class="fa-solid fa-magnifying-glass"></i> Search
+                </button>
             </div>
-            <div class="ticket-body">
-                <div class="ticket-details">
-                    <div class="ticket-col">
-                        <span>Reservation ID</span>
-                        <strong id="ticketId">#AC-7281</strong>
-                    </div>
-                    <div class="ticket-col">
-                        <span>Guest Name</span>
-                        <strong id="ticketName">John Doe</strong>
-                    </div>
+
+            <!-- History Dashboard Grid -->
+            <div class="history-grid" id="trackingDashboard">
+                <!-- Dynamically loaded history details go here -->
+                <div class="empty-cart-msg" style="padding: 20px 0; background: var(--bg-tertiary); border: 1px dashed var(--border-color); border-radius: 12px;">
+                    <i class="fa-solid fa-clock-rotate-left"></i>
+                    <p>Enter your phone number or reservation code above to check status in real-time, or place an order to see its progress instantly.</p>
                 </div>
-                <div class="ticket-details">
-                    <div class="ticket-col">
-                        <span>Date</span>
-                        <strong id="ticketDate">2026-07-20</strong>
-                    </div>
-                    <div class="ticket-col">
-                        <span>Time Slot</span>
-                        <strong id="ticketTime">10:30 AM</strong>
-                    </div>
-                </div>
-                <div class="ticket-details">
-                    <div class="ticket-col">
-                        <span>Guests</span>
-                        <strong id="ticketGuests">2 People</strong>
-                    </div>
-                    <div class="ticket-col">
-                        <span>Table Preference</span>
-                        <strong id="ticketTable">Window Side</strong>
-                    </div>
-                </div>
-                <div class="ticket-barcode">
-                    <div class="barcode-line"></div>
-                    <p>Show this receipt at the reception. Welcome!</p>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-primary" id="closeModal">Done</button>
             </div>
         </div>
-    </div>
+    </section>
 
-    <!-- Checkout Details Modal -->
-    <div class="modal" id="checkoutModal">
-        <div class="modal-content checkout-card">
-            <div class="cart-header">
-                <h3>Delivery Details</h3>
-                <button class="close-cart" id="closeCheckoutModal">&times;</button>
+    <!-- Slide-in Cart Sidebar (Drawer) -->
+    <div class="drawer" id="cartDrawer">
+        <div class="drawer-header">
+            <h3><i class="fa-solid fa-cart-shopping"></i> Your Cart</h3>
+            <button class="close-drawer" id="closeCartDrawer" aria-label="Close cart">&times;</button>
+        </div>
+        
+        <div class="drawer-body">
+            <div id="cartItemsContainer">
+                <!-- Cart items will be loaded here -->
             </div>
-            <form id="checkoutForm" class="checkout-form" style="padding: 24px;">
-                <div class="form-group" style="margin-bottom: 16px;">
-                    <label for="checkoutPhone">Phone Number</label>
-                    <input type="tel" id="checkoutPhone" required placeholder="e.g. 0300-1234567" style="width: 100%;">
+            
+            <form id="checkoutForm" style="display: none; border-top: 1px solid var(--border-color); padding-top: 24px; margin-top: 20px;">
+                <h4 style="margin-bottom: 18px; font-family: var(--font-heading); color: var(--primary);">Checkout Details</h4>
+                <div class="form-group">
+                    <label class="form-label" for="checkoutName">Customer Name</label>
+                    <input type="text" id="checkoutName" required class="form-control" placeholder="Enter your name">
                 </div>
-                <div class="form-group" style="margin-bottom: 16px;">
-                    <label for="checkoutType">Delivery Option</label>
-                    <select id="checkoutType" required style="width: 100%;">
-                        <option value="delivery" selected>Home Delivery (Rs. 150 Fee)</option>
-                        <option value="pickup">Self-Pickup (Free)</option>
+                <div class="form-group">
+                    <label class="form-label" for="checkoutPhone">Phone Number</label>
+                    <input type="tel" id="checkoutPhone" required class="form-control" placeholder="e.g., 03001234567">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="checkoutDelivery">Delivery Type</label>
+                    <select id="checkoutDelivery" class="form-control">
+                        <option value="Dine-in">Dine-in (At Cafe)</option>
+                        <option value="Takeaway" selected>Takeaway (Pick Up)</option>
+                        <option value="Home Delivery">Home Delivery</option>
                     </select>
                 </div>
-                <div class="form-group" id="addressGroup" style="margin-bottom: 16px;">
-                    <label for="checkoutAddress">Delivery Address</label>
-                    <input type="text" id="checkoutAddress" required placeholder="Street, Apartment, Block, City" style="width: 100%;">
-                </div>
-                <div class="form-group" style="margin-bottom: 20px;">
-                    <label for="checkoutPayment">Payment Method</label>
-                    <select id="checkoutPayment" required style="width: 100%;">
-                        <option value="cod" selected>Cash on Delivery (COD)</option>
-                        <option value="card">Credit / Debit Card</option>
-                        <option value="wallet">Mobile Wallet (EasyPaisa / JazzCash)</option>
-                    </select>
-                </div>
-                <div class="total-row" style="margin-bottom: 20px; font-size: 1.1rem; border-top: 1px solid var(--border-color); padding-top: 12px;">
-                    <span style="color: var(--text-primary); font-weight: 700;">Final Payable Amount:</span>
-                    <strong id="checkoutSummaryTotal" style="color: var(--primary);">Rs. 0</strong>
-                </div>
-                <button type="submit" class="btn btn-primary btn-block">Confirm Order</button>
             </form>
         </div>
+
+        <div class="drawer-footer">
+            <div class="cart-summary-row">
+                <span class="cart-total-label">Total Amount:</span>
+                <span class="cart-total-val" id="cartTotalVal">Rs. 0</span>
+            </div>
+            <button class="btn" id="checkoutActionBtn" style="width: 100%; justify-content: center;">
+                Proceed to Checkout
+            </button>
+        </div>
     </div>
 
-    <!-- Order Confirmed Modal -->
-    <div class="modal" id="orderModal">
-        <div class="modal-content order-success-card">
-            <div class="success-icon">
-                <i class="fa-solid fa-circle-check"></i>
-            </div>
-            <h3>Order Placed Successfully!</h3>
-            <p>Our baristas and bakers have started preparing your delights.</p>
-            
-            <!-- Live Tracker -->
-            <div class="order-tracker">
-                <div class="tracker-progress">
-                    <div class="tracker-progress-bar" id="trackerProgressBar"></div>
-                </div>
-                <div class="tracker-steps">
-                    <div class="tracker-step active" id="step-1">
-                        <div class="step-icon"><i class="fa-solid fa-receipt"></i></div>
-                        <span>Placed</span>
-                    </div>
-                    <div class="tracker-step" id="step-2">
-                        <div class="step-icon"><i class="fa-solid fa-fire-burner"></i></div>
-                        <span>Kitchen</span>
-                    </div>
-                    <div class="tracker-step" id="step-3">
-                        <div class="step-icon"><i class="fa-solid fa-motorcycle"></i></div>
-                        <span>On the Way</span>
-                    </div>
-                    <div class="tracker-step" id="step-4">
-                        <div class="step-icon"><i class="fa-solid fa-house-chimney"></i></div>
-                        <span>Delivered</span>
-                    </div>
-                </div>
-            </div>
+    <!-- Blur Background Overlay -->
+    <div class="overlay" id="uiOverlay"></div>
 
-            <div class="order-summary-box">
-                <h4>Order Invoice Details</h4>
-                <div id="orderSummaryItems"></div>
-                
-                <div class="order-invoice-details">
-                    <div class="invoice-row">
-                        <span>Delivery Type:</span>
-                        <span id="invoiceDeliveryType">Home Delivery</span>
-                    </div>
-                    <div class="invoice-row">
-                        <span>Contact Number:</span>
-                        <span id="invoicePhone">0300-1234567</span>
-                    </div>
-                    <div class="invoice-row" id="invoiceAddressRow">
-                        <span>Delivery Address:</span>
-                        <span id="invoiceAddress">123 Street</span>
-                    </div>
-                    <div class="invoice-row">
-                        <span>Payment Method:</span>
-                        <span id="invoicePayment">Cash on Delivery</span>
-                    </div>
-                </div>
-                <hr>
-                <div class="total-row font-bold">
-                    <span>Grand Total:</span>
-                    <span id="orderPaidTotal">Rs. 0</span>
-                </div>
-            </div>
-            <button class="btn btn-primary" id="closeOrderModal">Perfect!</button>
-        </div>
+    <!-- Toast Notification -->
+    <div class="toast" id="customToast">
+        <i class="fa-solid fa-circle-check"></i>
+        <span class="toast-msg" id="toastMsg">Order placed successfully!</span>
     </div>
 
     <!-- Footer -->
-    <footer class="footer">
-        <div class="container footer-grid">
-            <div class="footer-brand">
-                <a href="#" class="logo-brand">
-                    <svg class="logo-icon" viewBox="0 0 100 100" width="38" height="38">
-                        <path d="M30,42 h40 c4,0 8,3 8,8 v8 c0,9 -7,16 -16,16 h-16 c-9,0 -16,-7 -16,-16 v-8 C22,45 26,42 30,42 z" fill="none" stroke="var(--primary)" stroke-width="4.5" stroke-linecap="round"/>
-                        <path d="M70,49 c3,0 6,3 6,6 v1 c0,3 -3,6 -6,6" fill="none" stroke="var(--primary)" stroke-width="4.5" stroke-linecap="round"/>
-                        <path d="M22,80 h56" fill="none" stroke="var(--primary)" stroke-width="4.5" stroke-linecap="round"/>
-                        <path d="M38,32 c1,-3 -1,-6 0,-9" fill="none" stroke="var(--accent)" stroke-width="3" stroke-linecap="round"/>
-                        <path d="M50,34 c2,-4 -1,-8 1,-12" fill="none" stroke="var(--accent)" stroke-width="3" stroke-linecap="round"/>
-                        <path d="M62,32 c1,-3 -1,-6 0,-9" fill="none" stroke="var(--accent)" stroke-width="3" stroke-linecap="round"/>
-                    </svg>
-                    <span class="logo-text"><span class="logo-accent">Ayssh</span> Cafe</span>
-                </a>
-                <p>An exquisite culinary retreat serving ethically sourced coffees, freshly baked cakes, and home-style premium biscuits.</p>
-                <div class="social-links">
-                    <a href="#" aria-label="Facebook"><i class="fa-brands fa-facebook"></i></a>
-                    <a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
-                    <a href="#" aria-label="Twitter"><i class="fa-brands fa-x-twitter"></i></a>
-                    <a href="#" aria-label="Pinterest"><i class="fa-brands fa-pinterest"></i></a>
-                </div>
+    <footer>
+        <div class="container">
+            <div class="footer-logo">Ayssh <span>Cafe</span></div>
+            <p class="footer-desc">Premium flavors and fresh bakes served in the heart of the city. Join us for a delightful culinary escape.</p>
+            <div class="footer-socials">
+                <a href="#" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+                <a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                <a href="#" aria-label="Twitter"><i class="fa-brands fa-x-twitter"></i></a>
             </div>
-            <div class="footer-links">
-                <h4>Quick Navigation</h4>
-                <ul>
-                    <li><a href="#home">Home</a></li>
-                    <li><a href="#about">Our Story</a></li>
-                    <li><a href="#menu">Specialty Menu</a></li>
-                    <li><a href="#reservation">Book Table</a></li>
-                    <li><a href="#testimonials">Reviews</a></li>
-                    <li><a href="admin.html" target="_blank" style="color: var(--primary); font-weight: bold;"><i class="fa-solid fa-user-shield"></i> Admin Portal</a></li>
-                </ul>
-            </div>
-            <div class="footer-contact">
-                <h4>Contact Details</h4>
-                <p><i class="fa-solid fa-location-dot"></i> 102 Cocoa Bean Blvd, Clifton, Karachi</p>
-                <p><i class="fa-solid fa-phone"></i> +92 21 3456789</p>
-                <p><i class="fa-solid fa-envelope"></i> hello@aysshcafe.com</p>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            <p>&copy; 2026 Ayssh Cafe. All rights reserved. Made with love for premium coffee & cakes.</p>
+            <div class="footer-copyright">&copy; 2026 Ayssh Cafe. All rights reserved.</div>
         </div>
     </footer>
 
-    <!-- Scroll To Top Button -->
-    <button id="scrollTopBtn" class="scroll-top-btn" aria-label="Scroll to Top">
-        <i class="fa-solid fa-arrow-up"></i>
-    </button>
-
-    <!-- Chatbot Widget -->
-    <button id="chatbotBubble" class="chatbot-bubble" aria-label="Open Chat">
-        <i class="fa-solid fa-comments"></i>
-        <span class="chatbot-notification">1</span>
-    </button>
-
-    <div id="chatbotWindow" class="chatbot-window">
-        <div class="chatbot-header">
-            <div class="chatbot-header-info">
-                <svg viewBox="0 0 100 100" width="30" height="30" class="chatbot-header-logo">
-                    <path d="M30,42 h40 c4,0 8,3 8,8 v8 c0,9 -7,16 -16,16 h-16 c-9,0 -16,-7 -16,-16 v-8 C22,45 26,42 30,42 z" fill="none" stroke="var(--primary)" stroke-width="6.5" stroke-linecap="round"/>
-                    <path d="M70,49 c3,0 6,3 6,6 v1 c0,3 -3,6 -6,6" fill="none" stroke="var(--primary)" stroke-width="6.5" stroke-linecap="round"/>
-                    <path d="M22,80 h56" fill="none" stroke="var(--primary)" stroke-width="6.5" stroke-linecap="round"/>
-                </svg>
-                <div class="chatbot-header-title">
-                    <h4>Ayssh Cafe Bot</h4>
-                    <span class="chatbot-status"><span class="chatbot-status-dot"></span> Online</span>
-                </div>
-            </div>
-            <button id="closeChatbot" class="chatbot-close-btn" aria-label="Close Chat">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-        </div>
-
-        <div class="chatbot-feed" id="chatbotFeed">
-            <div class="chatbot-msg bot">
-                <div class="chatbot-msg-bubble">
-                    Hi there! Welcome to Ayssh Cafe. ☕ How can I help you today?
-                </div>
-            </div>
-        </div>
-
-        <div class="chatbot-prompts">
-            <button class="chatbot-prompt-chip" data-prompt="timings">🕒 Hours</button>
-            <button class="chatbot-prompt-chip" data-prompt="location">📍 Location</button>
-            <button class="chatbot-prompt-chip" data-prompt="book">📅 Book Table</button>
-            <button class="chatbot-prompt-chip" data-prompt="specials">✨ Specials</button>
-        </div>
-
-        <form id="chatbotForm" class="chatbot-input-area">
-            <input type="text" id="chatbotInput" placeholder="Type a message..." autocomplete="off" required>
-            <button type="submit" class="chatbot-send-btn" aria-label="Send Message">
-                <i class="fa-solid fa-paper-plane"></i>
-            </button>
-        </form>
-    </div>
-
-    <!-- Firebase Core & Firestore SDKs -->
+    <!-- ==================== DATABASE SCRIPTS ==================== -->
+    <!-- Firebase compatibility SDKs matching admin.html -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
-    <!-- App Script -->
-    <script src="app.js?v=2.0"></script>
+    <!-- Client Logic -->
+    <script src="app.js"></script>
 </body>
 </html>
