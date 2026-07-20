@@ -678,50 +678,7 @@
     <!-- ==================== AUTHENTICATION WRAPPER ==================== -->
     <div class="login-container" id="authContainer">
         
-        <!-- 1. Setup Admin Account Card -->
-        <div class="login-card" id="setupCard" style="display: none;">
-            <div class="login-logo">
-                <svg viewBox="0 0 100 100" width="44" height="44">
-                    <path d="M30,42 h40 c4,0 8,3 8,8 v8 c0,9 -7,16 -16,16 h-16 c-9,0 -16,-7 -16,-16 v-8 C22,45 26,42 30,42 z" fill="none" stroke="var(--primary)" stroke-width="5" stroke-linecap="round"/>
-                    <path d="M70,49 c3,0 6,3 6,6 v1 c0,3 -3,6 -6,6" fill="none" stroke="var(--primary)" stroke-width="5" stroke-linecap="round"/>
-                    <path d="M22,80 h56" fill="none" stroke="var(--primary)" stroke-width="5" stroke-linecap="round"/>
-                </svg>
-                <div class="login-logo-text"><span>Ayssh</span> Cafe</div>
-            </div>
-            <h2 style="margin-bottom: 8px;">Create Admin Account</h2>
-            <p style="color: var(--text-secondary); font-size: 0.82rem; margin-bottom: 20px;">Set up your secure, personal local administrator credentials. Your password will be encrypted using industrial SHA-256 hashing inside your local browser storage.</p>
-            <form id="setupForm">
-                <div class="form-group">
-                    <label for="setupUsername">Create Username</label>
-                    <input type="text" id="setupUsername" placeholder="e.g. admin" required autocomplete="username">
-                </div>
-                <div class="form-group">
-                    <label for="setupPassword">Create Password</label>
-                    <input type="password" id="setupPassword" placeholder="••••••••" required autocomplete="new-password">
-                </div>
-                <div class="form-group">
-                    <label for="setupConfirmPassword">Confirm Password</label>
-                    <input type="password" id="setupConfirmPassword" placeholder="••••••••" required autocomplete="new-password">
-                </div>
-                <div class="form-group">
-                    <label for="setupQuestion">Security Recovery Question</label>
-                    <select id="setupQuestion" style="background-color: var(--bg-secondary); border: 1px solid var(--border-color); color: var(--text-primary); padding: 12px; border-radius: var(--border-radius-sm); font-family: var(--font-body); font-size: 0.9rem; width: 100%; outline: none; transition: var(--transition);">
-                        <option value="First pet name">What was the name of your first pet?</option>
-                        <option value="Sixth grade school">What school did you attend for sixth grade?</option>
-                        <option value="Parents meeting city">In what city or town did your parents meet?</option>
-                        <option value="First car model">What was the make and model of your first car?</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="setupAnswer">Your Security Answer</label>
-                    <input type="text" id="setupAnswer" placeholder="Answer is case-insensitive" required>
-                </div>
-                <button type="submit" class="btn">Register & Log In <i class="fa-solid fa-user-plus"></i></button>
-                <div class="error-message" id="setupError">Passwords do not match!</div>
-            </form>
-        </div>
-
-        <!-- 2. Admin Log In Card -->
+        <!-- Admin Log In Card -->
         <div class="login-card" id="loginCard" style="display: none;">
             <div class="login-logo">
                 <svg viewBox="0 0 100 100" width="44" height="44">
@@ -743,50 +700,6 @@
                 </div>
                 <button type="submit" class="btn">Log In <i class="fa-solid fa-right-to-bracket"></i></button>
                 <div class="error-message" id="loginError">Incorrect username or password!</div>
-                <div style="margin-top: 20px;">
-                    <a href="#" id="forgotPasswordLink" style="color: var(--primary); font-size: 0.85rem; text-decoration: none; font-weight: 600; border-bottom: 1px dashed var(--primary); padding-bottom: 2px;">Forgot Password?</a>
-                </div>
-            </form>
-        </div>
-
-        <!-- 3. Password Recovery Card -->
-        <div class="login-card" id="recoveryCard" style="display: none;">
-            <div class="login-logo">
-                <svg viewBox="0 0 100 100" width="44" height="44">
-                    <path d="M30,42 h40 c4,0 8,3 8,8 v8 c0,9 -7,16 -16,16 h-16 c-9,0 -16,-7 -16,-16 v-8 C22,45 26,42 30,42 z" fill="none" stroke="var(--primary)" stroke-width="5" stroke-linecap="round"/>
-                    <path d="M70,49 c3,0 6,3 6,6 v1 c0,3 -3,6 -6,6" fill="none" stroke="var(--primary)" stroke-width="5" stroke-linecap="round"/>
-                    <path d="M22,80 h56" fill="none" stroke="var(--primary)" stroke-width="5" stroke-linecap="round"/>
-                </svg>
-                <div class="login-logo-text"><span>Ayssh</span> Cafe</div>
-            </div>
-            <h2 style="margin-bottom: 8px;">Reset Password</h2>
-            <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 24px;" id="recoveryQuestionLabel">Security question will load here...</p>
-            
-            <!-- Step A: Verify Answer -->
-            <form id="recoveryForm">
-                <div class="form-group">
-                    <label for="recoveryAnswer">Your Answer</label>
-                    <input type="text" id="recoveryAnswer" placeholder="Type answer here" required>
-                </div>
-                <button type="submit" class="btn">Verify Answer <i class="fa-solid fa-key"></i></button>
-                <div class="error-message" id="recoveryError">Incorrect answer! Security answer verification failed.</div>
-                <div style="margin-top: 20px;">
-                    <a href="#" id="backToLoginLink" style="color: var(--text-secondary); font-size: 0.85rem; text-decoration: none; font-weight: 600;">Back to Login</a>
-                </div>
-            </form>
-
-            <!-- Step B: Enter New Password (hidden initially) -->
-            <form id="resetPasswordForm" style="display: none;">
-                <div class="form-group">
-                    <label for="newPassword">New Password</label>
-                    <input type="password" id="newPassword" placeholder="••••••••" required autocomplete="new-password">
-                </div>
-                <div class="form-group">
-                    <label for="confirmNewPassword">Confirm New Password</label>
-                    <input type="password" id="confirmNewPassword" placeholder="••••••••" required autocomplete="new-password">
-                </div>
-                <button type="submit" class="btn">Update Password <i class="fa-solid fa-lock-open"></i></button>
-                <div class="error-message" id="resetError">Passwords do not match!</div>
             </form>
         </div>
 
@@ -1057,26 +970,15 @@
                 return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
             };
 
-            // --- AUTHENTICATION SHIELD & SETUP WIZARD ---
+            // --- AUTHENTICATION SHIELD ---
             const authContainer = document.getElementById('authContainer');
-            const setupCard = document.getElementById('setupCard');
             const loginCard = document.getElementById('loginCard');
-            const recoveryCard = document.getElementById('recoveryCard');
             const dashboardContainer = document.getElementById('dashboardContainer');
-
-            const setupForm = document.getElementById('setupForm');
             const loginForm = document.getElementById('loginForm');
-            const recoveryForm = document.getElementById('recoveryForm');
-            const resetPasswordForm = document.getElementById('resetPasswordForm');
-
             const loginError = document.getElementById('loginError');
-            const setupError = document.getElementById('setupError');
-            const recoveryError = document.getElementById('recoveryError');
-            const resetError = document.getElementById('resetError');
 
             const checkAuth = () => {
                 const isLogged = sessionStorage.getItem('ayssh_admin_logged') === 'true';
-                const hasAccount = localStorage.getItem('ayssh_admin_username') !== null;
 
                 if (isLogged) {
                     authContainer.style.display = 'none';
@@ -1085,49 +987,9 @@
                 } else {
                     authContainer.style.display = 'flex';
                     dashboardContainer.style.display = 'none';
-                    
-                    // Hide all cards first
-                    setupCard.style.display = 'none';
-                    loginCard.style.display = 'none';
-                    recoveryCard.style.display = 'none';
-
-                    if (!hasAccount) {
-                        setupCard.style.display = 'block';
-                    } else {
-                        loginCard.style.display = 'block';
-                    }
+                    loginCard.style.display = 'block';
                 }
             };
-
-            // Setup Form Submission (Hashed registration)
-            setupForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const username = document.getElementById('setupUsername').value.trim();
-                const pass = document.getElementById('setupPassword').value;
-                const confirmPass = document.getElementById('setupConfirmPassword').value;
-                const question = document.getElementById('setupQuestion').value;
-                const answer = document.getElementById('setupAnswer').value;
-
-                if (pass !== confirmPass) {
-                    setupError.style.display = 'block';
-                    return;
-                }
-                setupError.style.display = 'none';
-
-                // Hash password and answer securely
-                const passwordHash = await hashPassword(pass);
-                const answerHash = await hashPassword(answer);
-
-                localStorage.setItem('ayssh_admin_username', username);
-                localStorage.setItem('ayssh_admin_hash', passwordHash);
-                localStorage.setItem('ayssh_admin_question', question);
-                localStorage.setItem('ayssh_admin_answer_hash', answerHash);
-
-                sessionStorage.setItem('ayssh_admin_logged', 'true');
-                setupForm.reset();
-                showToast('Administrator Account successfully created!');
-                checkAuth();
-            });
 
             // Login Form Submission
             loginForm.addEventListener('submit', async (e) => {
@@ -1135,8 +997,9 @@
                 const inputUser = document.getElementById('loginUsername').value.trim();
                 const inputPass = document.getElementById('loginPassword').value;
 
-                const storedUser = localStorage.getItem('ayssh_admin_username');
-                const storedHash = localStorage.getItem('ayssh_admin_hash');
+                // Hardcoded secure owner credentials
+                const storedUser = "admin";
+                const storedHash = "65c9cafc87a56045bc646032134bf369ddc1d8bab5425688c4e217b65812a219"; // SHA-256 for ayssh_secure_admin_2026
 
                 const inputHash = await hashPassword(inputPass);
 
@@ -1148,61 +1011,6 @@
                 } else {
                     loginError.style.display = 'block';
                 }
-            });
-
-            // Forgot Password Transition
-            document.getElementById('forgotPasswordLink').addEventListener('click', (e) => {
-                e.preventDefault();
-                loginCard.style.display = 'none';
-                recoveryCard.style.display = 'block';
-                
-                const question = localStorage.getItem('ayssh_admin_question') || 'What was the name of your first pet?';
-                document.getElementById('recoveryQuestionLabel').textContent = `Security Question: "${question}"`;
-                recoveryForm.style.display = 'block';
-                resetPasswordForm.style.display = 'none';
-            });
-
-            // Return to login from recovery
-            document.getElementById('backToLoginLink').addEventListener('click', (e) => {
-                e.preventDefault();
-                checkAuth();
-            });
-
-            // Recovery Answer Verification
-            recoveryForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const inputAnswer = document.getElementById('recoveryAnswer').value;
-                const storedAnswerHash = localStorage.getItem('ayssh_admin_answer_hash');
-                const inputAnswerHash = await hashPassword(inputAnswer);
-
-                if (inputAnswerHash === storedAnswerHash) {
-                    recoveryError.style.display = 'none';
-                    recoveryForm.style.display = 'none';
-                    resetPasswordForm.style.display = 'block';
-                    recoveryForm.reset();
-                } else {
-                    recoveryError.style.display = 'block';
-                }
-            });
-
-            // Password Reset Form Submission
-            resetPasswordForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const newPass = document.getElementById('newPassword').value;
-                const confirmNewPass = document.getElementById('confirmNewPassword').value;
-
-                if (newPass !== confirmNewPass) {
-                    resetError.style.display = 'block';
-                    return;
-                }
-                resetError.style.display = 'none';
-
-                const newPasswordHash = await hashPassword(newPass);
-                localStorage.setItem('ayssh_admin_hash', newPasswordHash);
-
-                resetPasswordForm.reset();
-                showToast('Password successfully reset! Please log in.');
-                checkAuth();
             });
 
             document.getElementById('resetDbBtn').addEventListener('click', () => {
