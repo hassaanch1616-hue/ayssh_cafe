@@ -3,6 +3,35 @@
 // ==========================================
 
 document.addEventListener('DOMContentLoaded', () => {
+    // ---- FIREBASE CONFIGURATION & INITIALIZATION ----
+    // Set this config to synchronize data between devices in real-time.
+    // If not configured, the website automatically falls back to localStorage.
+    const FIREBASE_CONFIG = {
+        apiKey: "AIzaSyCRA1A9Qqse2xlpVLzNXFXzCbQ-3tfzP9Q",
+        authDomain: "ayssh-cafe.firebaseapp.com",
+        databaseURL: "https://ayssh-cafe-default-rtdb.firebaseio.com",
+        projectId: "ayssh-cafe",
+        storageBucket: "ayssh-cafe.firebasestorage.app",
+        messagingSenderId: "857217612395",
+        appId: "1:857217612395:web:c794969d6f9c0b1fc8cf2e",
+        measurementId: "G-HYZRXKPL52"
+    };
+
+    let db = null;
+    const isFirebaseConfigured = FIREBASE_CONFIG.apiKey && FIREBASE_CONFIG.projectId;
+
+    if (isFirebaseConfigured) {
+        try {
+            firebase.initializeApp(FIREBASE_CONFIG);
+            db = firebase.firestore();
+            console.log("Firebase Firestore initialized successfully.");
+        } catch (err) {
+            console.error("Firebase Initialization Error:", err);
+        }
+    } else {
+        console.log("Firebase not configured. Falling back to localStorage database.");
+    }
+
     // ---- STATE MANAGEMENT ----
     let cart = [];
     let currentTestimonialIndex = 0;
@@ -406,6 +435,13 @@ document.addEventListener('DOMContentLoaded', () => {
         orders.push(newOrder);
         localStorage.setItem('ayssh_orders', JSON.stringify(orders));
 
+        // Save to Firebase Firestore if initialized
+        if (db) {
+            db.collection('orders').doc(orderId).set(newOrder).catch(err => {
+                console.error("Firestore Order Save Error:", err);
+            });
+        }
+
         // Close Checkout form, open Success Modal
         checkoutModal.classList.remove('open');
         orderModal.classList.add('open');
@@ -546,8 +582,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('ticketTable').textContent = table;
 
             // Save to localStorage
-            const bookings = JSON.parse(localStorage.getItem('ayssh_bookings') || '[]');
-            bookings.push({
+            const newBooking = {
                 id: randomId,
                 name: name,
                 guests: guests === '1' ? '1 Person' : guests + ' People',
@@ -555,8 +590,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 date: date,
                 time: time,
                 timestamp: new Date().toISOString()
-            });
+            };
+            bookings.push(newBooking);
             localStorage.setItem('ayssh_bookings', JSON.stringify(bookings));
+
+            // Save to Firebase Firestore if initialized
+            if (db) {
+                db.collection('bookings').doc(randomId).set(newBooking).catch(err => {
+                    console.error("Firestore Booking Save Error:", err);
+                });
+            }
 
             // Show ticket modal
             ticketModal.classList.add('open');

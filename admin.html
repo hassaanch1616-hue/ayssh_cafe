@@ -958,9 +958,60 @@
     </div>
 
     <!-- ==================== JAVASCRIPT CONTROL ==================== -->
+    <!-- Firebase Core & Firestore SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            
+            // ---- FIREBASE CONFIGURATION & INITIALIZATION ----
+            // Set this config to synchronize data between devices in real-time.
+            // If not configured, the website automatically falls back to localStorage.
+            const FIREBASE_CONFIG = {
+                apiKey: "AIzaSyCRA1A9Qqse2xlpVLzNXFXzCbQ-3tfzP9Q",
+                authDomain: "ayssh-cafe.firebaseapp.com",
+                databaseURL: "https://ayssh-cafe-default-rtdb.firebaseio.com",
+                projectId: "ayssh-cafe",
+                storageBucket: "ayssh-cafe.firebasestorage.app",
+                messagingSenderId: "857217612395",
+                appId: "1:857217612395:web:c794969d6f9c0b1fc8cf2e",
+                measurementId: "G-HYZRXKPL52"
+            };
+
+            let db = null;
+            const isFirebaseConfigured = FIREBASE_CONFIG.apiKey && FIREBASE_CONFIG.projectId;
+
+            if (isFirebaseConfigured) {
+                try {
+                    firebase.initializeApp(FIREBASE_CONFIG);
+                    db = firebase.firestore();
+                    console.log("Firebase Firestore initialized successfully.");
+
+                    // Real-Time Listeners to synchronize data automatically
+                    db.collection('orders').onSnapshot(snapshot => {
+                        const orders = [];
+                        snapshot.forEach(doc => {
+                            orders.push(doc.data());
+                        });
+                        localStorage.setItem('ayssh_orders', JSON.stringify(orders));
+                        renderAllData();
+                    });
+
+                    db.collection('bookings').onSnapshot(snapshot => {
+                        const bookings = [];
+                        snapshot.forEach(doc => {
+                            bookings.push(doc.data());
+                        });
+                        localStorage.setItem('ayssh_bookings', JSON.stringify(bookings));
+                        renderAllData();
+                    });
+                } catch (err) {
+                    console.error("Firebase Initialization Error:", err);
+                }
+            } else {
+                console.log("Firebase not configured. Falling back to local device storage.");
+            }
+
             // --- CRYPTOGRAPHIC SHA-256 HASHING ---
             const hashPassword = async (password) => {
                 const encoder = new TextEncoder();
@@ -1191,7 +1242,7 @@
                 showToast('Store Menu Prices successfully adjusted!');
             });
 
-            // Update Order Status in localStorage
+            // Update Order Status in localStorage / Firestore
             window.updateOrderStatus = (id, newStatus) => {
                 const orders = JSON.parse(localStorage.getItem('ayssh_orders') || '[]');
                 const ord = orders.find(o => o.id === id);
@@ -1199,30 +1250,51 @@
                     ord.status = newStatus;
                     localStorage.setItem('ayssh_orders', JSON.stringify(orders));
                     showToast(`Order ${id} status updated to ${newStatus}.`);
-                    renderKPIs();
-                    renderOrdersTable(); // Refresh the table UI
+                    
+                    if (db) {
+                        db.collection('orders').doc(id).update({ status: newStatus }).catch(err => {
+                            console.error("Firestore status update error:", err);
+                        });
+                    } else {
+                        renderKPIs();
+                        renderOrdersTable(); // Refresh locally if Firebase is not active
+                    }
                 }
             };
 
-            // Delete Order from localStorage
+            // Delete Order from localStorage / Firestore
             window.deleteOrder = (id) => {
                 if (confirm(`Are you sure you want to delete order ${id}?`)) {
                     let orders = JSON.parse(localStorage.getItem('ayssh_orders') || '[]');
                     orders = orders.filter(o => o.id !== id);
                     localStorage.setItem('ayssh_orders', JSON.stringify(orders));
                     showToast(`Order ${id} deleted.`);
-                    renderAllData();
+                    
+                    if (db) {
+                        db.collection('orders').doc(id).delete().catch(err => {
+                            console.error("Firestore order deletion error:", err);
+                        });
+                    } else {
+                        renderAllData(); // Refresh locally if Firebase is not active
+                    }
                 }
             };
 
-            // Cancel/Delete Reservation from localStorage
+            // Cancel/Delete Reservation from localStorage / Firestore
             window.deleteBooking = (id) => {
                 if (confirm(`Are you sure you want to cancel table reservation ${id}?`)) {
                     let bookings = JSON.parse(localStorage.getItem('ayssh_bookings') || '[]');
                     bookings = bookings.filter(b => b.id !== id);
                     localStorage.setItem('ayssh_bookings', JSON.stringify(bookings));
                     showToast(`Reservation ${id} successfully cancelled.`);
-                    renderAllData();
+                    
+                    if (db) {
+                        db.collection('bookings').doc(id).delete().catch(err => {
+                            console.error("Firestore booking cancellation error:", err);
+                        });
+                    } else {
+                        renderAllData(); // Refresh locally if Firebase is not active
+                    }
                 }
             };
 
