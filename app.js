@@ -620,6 +620,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('ticketTable').textContent = table;
 
             // Save to localStorage
+            const bookings = JSON.parse(localStorage.getItem('ayssh_bookings') || '[]');
             const newBooking = {
                 id: randomId,
                 name: name,
