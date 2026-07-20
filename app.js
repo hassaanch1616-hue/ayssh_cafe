@@ -1032,6 +1032,156 @@ Keep your responses polite, warm, premium, concise, and helpful. Do not talk abo
             history.pushState(null, null, `#${targetId}`);
         }
     });
+
+    // ---- DEDICATED FULL-PAGE CHATBOT CONTROLLERS ----
+    const pageChatForm = document.getElementById('pageChatForm');
+    const pageChatInput = document.getElementById('pageChatInput');
+    const pageChatFeed = document.getElementById('pageChatFeed');
+    const pagePromptChips = document.querySelectorAll('.page-prompt-chip');
+
+    // Helper to append message bubble to page feed
+    const appendPageChatMessage = (text, sender) => {
+        const msgDiv = document.createElement('div');
+        msgDiv.className = `page-chat-msg ${sender}`;
+        msgDiv.innerHTML = `<div class="page-chat-bubble">${text}</div>`;
+        if (pageChatFeed) {
+            pageChatFeed.appendChild(msgDiv);
+            pageChatFeed.scrollTop = pageChatFeed.scrollHeight;
+        }
+    };
+
+    // Helper to render Typing Indicator on page feed
+    const showPageTypingIndicator = () => {
+        const typingDiv = document.createElement('div');
+        typingDiv.className = 'page-chat-msg bot temp-typing';
+        typingDiv.innerHTML = `
+            <div class="page-chat-bubble typing-indicator">
+                <span></span><span></span><span></span>
+            </div>
+        `;
+        if (pageChatFeed) {
+            pageChatFeed.appendChild(typingDiv);
+            pageChatFeed.scrollTop = pageChatFeed.scrollHeight;
+        }
+        return typingDiv;
+    };
+
+    // Process Bot message with simulated typing delay (or Groq LPU API) for full-page
+    const processPageBotReply = async (userText) => {
+        const indicator = showPageTypingIndicator();
+        
+        const HARDCODED_API_KEY = "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"; 
+        const apiKey = localStorage.getItem('ayssh_groq_api_key') || HARDCODED_API_KEY;
+
+        if (apiKey) {
+            try {
+                // System instructions to customize Groq for Ayssh Cafe
+                const systemPrompt = `You are the friendly, elegant AI Assistant host for Ayssh Cafe in Clifton, Karachi.
+• Cafe Timings: 8:00 AM to 11:00 PM.
+• Menu Items: Premium Cappuccino (Rs. 450), Traditional Karak Chai (Rs. 250), Caramel Macchiato (Rs. 550), Chocolate Fudge Truffle (Rs. 950), Velvet Rose Cake (Rs. 1200), Lemon Drizzle Cake (Rs. 850), Choco-Chip Giant Cookie (Rs. 180), Butter Almond Biscotti (Rs. 220), Coconut Crunch Biscuits (Rs. 150).
+• Table Reservations: Visitors can reserve tables online. If they ask about booking a table, provide them with this link: <a href='#reservation' class='chatbot-link' style='color: var(--primary); font-weight: 700; text-decoration: underline;'>Book Table</a>.
+Keep your responses polite, warm, premium, concise, and helpful. Do not talk about unrelated things unless the user asks general questions, but always maintain your persona as the Ayssh Cafe host. Output standard HTML formatting or bold markers.`;
+
+                const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${apiKey}`
+                    },
+                    body: JSON.stringify({
+                        messages: [
+                            { role: 'system', content: systemPrompt },
+                            { role: 'user', content: userText }
+                        ],
+                        model: 'llama-3.1-8b-instant',
+                        stream: false
+                    })
+                });
+
+                const data = await response.json();
+                indicator.remove();
+
+                if (data.choices && data.choices[0] && data.choices[0].message) {
+                    let aiText = data.choices[0].message.content;
+                    // Format bold markers and line breaks
+                    aiText = aiText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                    aiText = aiText.replace(/\n/g, '<br>');
+                    appendPageChatMessage(aiText, 'bot');
+                } else {
+                    throw new Error('Invalid response structure');
+                }
+            } catch (err) {
+                console.error('Groq API Error:', err);
+                indicator.remove();
+                // Fallback to local
+                const rawReply = getBotResponse(userText);
+                const formattedReply = rawReply.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                appendPageChatMessage(formattedReply, 'bot');
+            }
+        } else {
+            // Standard local keyword matcher fallback
+            setTimeout(() => {
+                indicator.remove();
+                const rawReply = getBotResponse(userText);
+                const formattedReply = rawReply.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                appendPageChatMessage(formattedReply, 'bot');
+            }, 900);
+        }
+    };
+
+    // Submitting message through page input form
+    if (pageChatForm) {
+        pageChatForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const userText = pageChatInput.value;
+            if (!userText.trim()) return;
+
+            appendPageChatMessage(userText, 'user');
+            pageChatInput.value = '';
+            processPageBotReply(userText);
+        });
+    }
+
+    // Submitting message through page prompt chips
+    pagePromptChips.forEach(chip => {
+        chip.addEventListener('click', () => {
+            const promptType = chip.getAttribute('data-prompt');
+            let queryText = '';
+
+            if (promptType === 'timings') queryText = 'What are your café timings?';
+            else if (promptType === 'location') queryText = 'Where is the café located?';
+            else if (promptType === 'book') queryText = 'How do I book a table?';
+            else if (promptType === 'specials') queryText = 'What are today\'s specials?';
+
+            if (queryText) {
+                appendPageChatMessage(queryText, 'user');
+                processPageBotReply(queryText);
+            }
+        });
+    });
+
+    // Intercept click on links dynamically added in page bot replies
+    if (pageChatFeed) {
+        pageChatFeed.addEventListener('click', (e) => {
+            if (e.target.classList.contains('chatbot-link') || e.target.tagName === 'A') {
+                const targetHref = e.target.getAttribute('href');
+                if (targetHref && targetHref.startsWith('#')) {
+                    e.preventDefault();
+                    const targetId = targetHref.substring(1);
+                    showSection(targetId);
+                    // Sync Navbar Active Class
+                    document.querySelectorAll('.nav-link').forEach(link => {
+                        link.classList.remove('active');
+                        if (link.getAttribute('href') === `#${targetId}`) {
+                            link.classList.add('active');
+                        }
+                    });
+                    // Update hash
+                    history.pushState(null, null, `#${targetId}`);
+                }
+            }
+        });
+    }
 });
 
 
