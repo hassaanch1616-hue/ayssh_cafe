@@ -2280,11 +2280,11 @@ main > section.active-section {
 }
 
 /* ==========================================================================
-   Full Page Dedicated AI Chatbot Section Styles
+   Full Page Dedicated AI Chatbot Section Styles (Matte Black Premium Theme)
    ========================================================================== */
 .page-chat-container {
-    background-color: var(--glass-bg);
-    border: 1px solid var(--glass-border);
+    background-color: #0b0b0c;
+    border: 1px solid #1a1a1c;
     border-radius: var(--border-radius-lg);
     box-shadow: var(--shadow-lg), var(--shadow-glow);
     backdrop-filter: blur(15px);
@@ -2296,9 +2296,9 @@ main > section.active-section {
 }
 
 .page-chat-header {
-    background: linear-gradient(135deg, rgba(6, 16, 13, 0.9) 0%, rgba(14, 28, 20, 0.9) 100%);
+    background: #121214;
     padding: 20px 24px;
-    border-bottom: 1px solid var(--border-color);
+    border-bottom: 1px solid #1a1a1c;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -2333,7 +2333,7 @@ main > section.active-section {
     display: flex;
     flex-direction: column;
     gap: 18px;
-    background-color: rgba(6, 16, 13, 0.45);
+    background-color: #060607;
     scroll-behavior: smooth;
 }
 
@@ -2361,8 +2361,8 @@ main > section.active-section {
 }
 
 .page-chat-msg.bot .page-chat-bubble {
-    background-color: var(--bg-secondary);
-    border: 1px solid var(--border-color);
+    background-color: #121214;
+    border: 1px solid #1a1a1c;
     border-top-left-radius: 4px;
 }
 
@@ -2379,13 +2379,13 @@ main > section.active-section {
     flex-wrap: wrap;
     gap: 10px;
     padding: 16px 24px;
-    background-color: rgba(6, 16, 13, 0.6);
-    border-top: 1px solid var(--border-color);
+    background-color: #0e0e10;
+    border-top: 1px solid #1a1a1c;
 }
 
 .page-prompt-chip {
-    background-color: var(--bg-tertiary);
-    border: 1px solid var(--border-color);
+    background-color: #121214;
+    border: 1px solid #1a1a1c;
     color: var(--text-secondary);
     padding: 8px 16px;
     border-radius: 30px;
@@ -2403,17 +2403,19 @@ main > section.active-section {
 }
 
 .page-chat-input-area {
-    background-color: rgba(6, 16, 13, 0.9);
+    background-color: #121214;
     padding: 16px 24px;
-    border-top: 1px solid var(--border-color);
+    border-top: 1px solid #1a1a1c;
     display: flex;
     gap: 16px;
+    align-items: center;
 }
 
 .page-chat-input-area input {
     flex: 1;
-    background-color: var(--bg-secondary);
-    border: 1px solid var(--border-color);
+    min-width: 0; /* Prevents input from overflowing flex container */
+    background-color: #060607;
+    border: 1px solid #1a1a1c;
     color: var(--text-primary);
     padding: 14px 20px;
     border-radius: 50px;
@@ -2433,13 +2435,15 @@ main > section.active-section {
     color: #06100D;
     border: none;
     padding: 0 24px;
+    height: 48px;
     border-radius: 50px;
     cursor: pointer;
     font-weight: 700;
     font-size: 0.9rem;
-    display: flex;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
+    flex-shrink: 0; /* Prevents button from shrinking/vanishing on narrow views */
     transition: var(--transition);
 }
 
@@ -2451,12 +2455,21 @@ main > section.active-section {
 @media (max-width: 768px) {
     .page-chat-feed {
         height: 380px;
+        padding: 16px;
+        gap: 14px;
     }
     .page-chat-input-area {
-        padding: 12px 16px;
+        padding: 12px;
+        gap: 8px;
+    }
+    .page-chat-input-area input {
+        padding: 10px 16px;
+        font-size: 0.9rem;
     }
     .page-chat-send-btn {
         padding: 0 16px;
+        height: 38px;
+        font-size: 0.85rem;
     }
 }
 
