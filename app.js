@@ -38,6 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const TAX_RATE = 0.15; // 15% GST
     let deliveryFee = 150; // Rs. 150
     let trackerInterval = null;
+    let orderListenerUnsubscribe = null;
 
     // No mock database initialization (starting empty as requested)
 
@@ -450,14 +451,18 @@ document.addEventListener('DOMContentLoaded', () => {
         cart = [];
         updateCartDOM();
 
-        // Launch Live Delivery Status Simulator
-        startOrderDeliveryTracker(typeValue === 'pickup');
+        // Launch Live Delivery Status Tracker
+        startOrderDeliveryTracker(orderId, typeValue === 'pickup');
     });
 
     // ---- LIVE DELIVERY TRACKER LOGIC ----
-    const startOrderDeliveryTracker = (isPickup) => {
-        // Clear any previous interval
+    const startOrderDeliveryTracker = (orderId, isPickup) => {
+        // Clear any previous interval or unsubscribe
         if (trackerInterval) clearInterval(trackerInterval);
+        if (orderListenerUnsubscribe) {
+            orderListenerUnsubscribe();
+            orderListenerUnsubscribe = null;
+        }
 
         // Update step titles dynamically if pickup
         if (isPickup) {
@@ -475,35 +480,64 @@ document.addEventListener('DOMContentLoaded', () => {
         resetStepsClasses();
         step1.classList.add('active');
 
-        let currentStep = 1;
-
-        // Simulator: Advance steps every 5 seconds
-        trackerInterval = setInterval(() => {
-            currentStep++;
-            if (currentStep === 2) {
-                // Kitchen step
-                step1.classList.remove('active');
-                step1.classList.add('completed');
-                step2.classList.add('active');
-                trackerProgressBar.style.width = '33%';
-            } else if (currentStep === 3) {
-                // Out for delivery / Ready step
-                step2.classList.remove('active');
-                step2.classList.add('completed');
-                step3.classList.add('active');
-                trackerProgressBar.style.width = '66%';
-            } else if (currentStep === 4) {
-                // Delivered / Picked up step
-                step3.classList.remove('active');
-                step3.classList.add('completed');
-                step4.classList.add('active');
-                step4.classList.add('completed');
-                trackerProgressBar.style.width = '100%';
-                
-                // End Simulation
-                clearInterval(trackerInterval);
-            }
-        }, 5000);
+        // Check if Firebase is configured & initialized
+        if (db && orderId) {
+            orderListenerUnsubscribe = db.collection('orders').doc(orderId).onSnapshot(doc => {
+                if (doc.exists) {
+                    const ord = doc.data();
+                    const status = ord.status || 'Processing';
+                    
+                    resetStepsClasses();
+                    
+                    if (status === 'Processing') {
+                        step1.classList.add('active');
+                        trackerProgressBar.style.width = '0%';
+                    } else if (status === 'Preparing') {
+                        step1.classList.add('completed');
+                        step2.classList.add('active');
+                        trackerProgressBar.style.width = '33%';
+                    } else if (status === 'Dispatching') {
+                        step1.classList.add('completed');
+                        step2.classList.add('completed');
+                        step3.classList.add('active');
+                        trackerProgressBar.style.width = '66%';
+                    } else if (status === 'Completed') {
+                        step1.classList.add('completed');
+                        step2.classList.add('completed');
+                        step3.classList.add('completed');
+                        step4.classList.add('active');
+                        step4.classList.add('completed');
+                        trackerProgressBar.style.width = '100%';
+                    }
+                }
+            }, err => {
+                console.error("Firestore listening error:", err);
+            });
+        } else {
+            // Fallback simulator if Firebase is not active
+            let currentStep = 1;
+            trackerInterval = setInterval(() => {
+                currentStep++;
+                if (currentStep === 2) {
+                    step1.classList.remove('active');
+                    step1.classList.add('completed');
+                    step2.classList.add('active');
+                    trackerProgressBar.style.width = '33%';
+                } else if (currentStep === 3) {
+                    step2.classList.remove('active');
+                    step2.classList.add('completed');
+                    step3.classList.add('active');
+                    trackerProgressBar.style.width = '66%';
+                } else if (currentStep === 4) {
+                    step3.classList.remove('active');
+                    step3.classList.add('completed');
+                    step4.classList.add('active');
+                    step4.classList.add('completed');
+                    trackerProgressBar.style.width = '100%';
+                    clearInterval(trackerInterval);
+                }
+            }, 5000);
+        }
     };
 
     const resetStepsClasses = () => {
@@ -517,6 +551,10 @@ document.addEventListener('DOMContentLoaded', () => {
         orderModal.classList.remove('open');
         if (trackerInterval) {
             clearInterval(trackerInterval);
+        }
+        if (orderListenerUnsubscribe) {
+            orderListenerUnsubscribe();
+            orderListenerUnsubscribe = null;
         }
     });
 
