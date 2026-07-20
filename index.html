@@ -20,10 +20,12 @@
                 <div class="logo-text">Ayssh <span>Cafe</span></div>
             </div>
             <ul class="nav-menu">
-                <li><span class="nav-link active" data-target="home">Home</span></li>
-                <li><span class="nav-link" data-target="menu">Menu</span></li>
-                <li><span class="nav-link" data-target="book">Book Table</span></li>
-                <li><span class="nav-link" data-target="track">Track Status</span></li>
+                <li><span class="nav-link active" data-target="tab-home">Home</span></li>
+                <li><span class="nav-link" data-target="tab-menu">Menu</span></li>
+                <li><span class="nav-link" data-target="tab-book">Book Table</span></li>
+                <li><span class="nav-link" data-target="tab-story">Our Story</span></li>
+                <li><span class="nav-link" data-target="tab-ai">AI Assistance</span></li>
+                <li><span class="nav-link" data-target="tab-track">Track Status</span></li>
             </ul>
             <div class="nav-actions">
                 <button class="cart-trigger" id="cartTrigger" aria-label="Open shopping bag">
@@ -35,138 +37,219 @@
         </div>
     </header>
 
-    <!-- Hero Section -->
-    <section class="hero" id="home">
-        <div class="container">
-            <div class="hero-content">
-                <span class="hero-subtitle">Est. 2026</span>
-                <h1>Handcrafted <span>Moments & Flavors</span></h1>
-                <p class="hero-desc">Indulge in our exquisite selection of specialty cappuccino, authentic karak chai, giant cookies, and gorgeous gourmet cakes, baked fresh every single day.</p>
-                <div class="hero-buttons">
-                    <button class="btn" id="heroMenuBtn">Explore Menu</button>
-                    <button class="btn btn-secondary" id="heroBookBtn">Book Table</button>
+    <!-- Home (Hero) Tab -->
+    <div class="tab-content active" id="tab-home">
+        <section class="hero">
+            <div class="container">
+                <div class="hero-content">
+                    <span class="hero-subtitle">Est. 2026</span>
+                    <h1>Handcrafted <span>Moments & Flavors</span></h1>
+                    <p class="hero-desc">Indulge in our exquisite selection of specialty cappuccino, authentic karak chai, giant cookies, and gorgeous gourmet cakes, baked fresh every single day.</p>
+                    <div class="hero-buttons">
+                        <button class="btn" id="heroMenuBtn">Explore Menu</button>
+                        <button class="btn btn-secondary" id="heroBookBtn">Book Table</button>
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
+    </div>
 
-    <!-- Menu Catalog Section -->
-    <section class="menu-section" id="menu">
-        <div class="container">
-            <h2 class="section-title">Our Gourmet <span>Selection</span></h2>
-            
-            <!-- Category Tabs -->
-            <div class="category-tabs">
-                <button class="category-tab active" data-category="All">All Menu Items</button>
-                <button class="category-tab" data-category="Coffee & Tea">Coffee & Aromatic Tea</button>
-                <button class="category-tab" data-category="Decadent Cakes">Decadent Cakes</button>
-                <button class="category-tab" data-category="Artisanal Cookies">Artisanal Cookies</button>
-            </div>
-
-            <!-- Products Grid -->
-            <div class="menu-grid" id="menuGrid">
-                <!-- Injected dynamically via app.js -->
-            </div>
-        </div>
-    </section>
-
-    <!-- Table Reservation Section -->
-    <section class="reservation-section" id="book">
-        <div class="container">
-            <div class="reservation-grid">
-                <div class="reservation-info">
-                    <h2 class="section-title" style="text-align: left;">Reserve A <span>Table</span></h2>
-                    <p>Escape into a serene sensory environment. Save a cozy spot ahead of time for your workspace requirements, romantic dates, or high-tea business gatherings.</p>
-                    <ul class="features-list">
-                        <li><i class="fa-solid fa-circle-check"></i> High-speed complementary fiber Wi-Fi</li>
-                        <li><i class="fa-solid fa-circle-check"></i> Premium window view options available</li>
-                        <li><i class="fa-solid fa-circle-check"></i> Free charging ports at every layout table</li>
-                        <li><i class="fa-solid fa-circle-check"></i> Personalized chef attention on request</li>
-                    </ul>
-                </div>
+    <!-- Menu Catalog Tab -->
+    <div class="tab-content" id="tab-menu">
+        <section class="menu-section">
+            <div class="container">
+                <h2 class="section-title">Our Gourmet <span>Selection</span></h2>
                 
-                <div class="card-form">
-                    <form id="reservationForm">
-                        <div class="form-group">
-                            <label class="form-label" for="reserveName">Guest Name</label>
-                            <input type="text" id="reserveName" required class="form-control" placeholder="Enter your full name">
+                <!-- Category Tabs -->
+                <div class="category-tabs">
+                    <button class="category-tab active" data-category="All">All Menu Items</button>
+                    <button class="category-tab" data-category="Coffee & Tea">Coffee & Aromatic Tea</button>
+                    <button class="category-tab" data-category="Decadent Cakes">Decadent Cakes</button>
+                    <button class="category-tab" data-category="Artisanal Cookies">Artisanal Cookies</button>
+                </div>
+
+                <!-- Products Grid -->
+                <div class="menu-grid" id="menuGrid">
+                    <!-- Injected dynamically via app.js -->
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Table Reservation Tab -->
+    <div class="tab-content" id="tab-book">
+        <section class="reservation-section">
+            <div class="container">
+                <div class="reservation-grid">
+                    <div class="reservation-info">
+                        <h2 class="section-title" style="text-align: left;">Reserve A <span>Table</span></h2>
+                        <p>Escape into a serene sensory environment. Save a cozy spot ahead of time for your workspace requirements, romantic dates, or high-tea business gatherings.</p>
+                        <ul class="features-list">
+                            <li><i class="fa-solid fa-circle-check"></i> High-speed complementary fiber Wi-Fi</li>
+                            <li><i class="fa-solid fa-circle-check"></i> Premium window view options available</li>
+                            <li><i class="fa-solid fa-circle-check"></i> Free charging ports at every layout table</li>
+                            <li><i class="fa-solid fa-circle-check"></i> Personalized chef attention on request</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="card-form">
+                        <form id="reservationForm">
+                            <div class="form-group">
+                                <label class="form-label" for="reserveName">Guest Name</label>
+                                <input type="text" id="reserveName" required class="form-control" placeholder="Enter your full name">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="reservePhone">Phone Number</label>
+                                <input type="tel" id="reservePhone" required class="form-control" placeholder="e.g., 03001234567">
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label" for="reserveGuests">Party Size</label>
+                                    <select id="reserveGuests" class="form-control">
+                                        <option value="1">1 Guest</option>
+                                        <option value="2" selected>2 Guests</option>
+                                        <option value="4">4 Guests</option>
+                                        <option value="6">6 Guests</option>
+                                        <option value="8">8 Guests</option>
+                                        <option value="10">10+ Guests</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="reserveTable">Table Layout</label>
+                                    <select id="reserveTable" class="form-control">
+                                        <option value="Standard Sitting">Standard Sitting</option>
+                                        <option value="Window View">Window View (Premium)</option>
+                                        <option value="Cozy Corner">Cozy Corner</option>
+                                        <option value="Outdoor Lounge">Outdoor Lounge</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label" for="reserveDate">Reservation Date</label>
+                                    <input type="date" id="reserveDate" required class="form-control">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="reserveTime">Time Slot</label>
+                                    <select id="reserveTime" class="form-control">
+                                        <option value="Afternoon (12:00 PM - 3:00 PM)">Afternoon (12pm - 3pm)</option>
+                                        <option value="High Tea (3:00 PM - 6:00 PM)">High Tea (3pm - 6pm)</option>
+                                        <option value="Dinner (6:00 PM - 9:00 PM)">Dinner (6pm - 9pm)</option>
+                                        <option value="Late Night (9:00 PM - 12:00 AM)">Late Night (9pm - 12am)</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn" style="width: 100%; justify-content: center; margin-top: 10px;">
+                                <i class="fa-solid fa-calendar-check"></i> Book My Table
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Our Story Tab -->
+    <div class="tab-content" id="tab-story">
+        <section class="story-section" style="padding: 80px 0;">
+            <div class="container">
+                <div class="reservation-grid" style="align-items: center;">
+                    <div class="reservation-info">
+                        <span class="hero-subtitle">Our Heritage</span>
+                        <h2 class="section-title" style="text-align: left; margin-bottom: 20px;">A Journey of Flavor, <span>Since 2026</span></h2>
+                        <p style="margin-bottom: 20px; font-size: 1.05rem;">Founded with a passion for excellence, Ayssh Cafe bridges clotted-cream traditional tea values with contemporary coffee roasting craftsmanship. Our dream is simple: to offer a refined sensory haven where every brew tells a story of heritage and quality.</p>
+                        <p style="margin-bottom: 30px; font-size: 1.05rem;">We roast our ethically sourced coffee beans in-house to unlock unique flavor profiles, and we bake our custom pastries, lemon drizzles, and giant cookies from scratch every day. Welcome to your cozy corner.</p>
+                        <button class="btn" id="storyMenuBtn"><i class="fa-solid fa-mug-hot"></i> Explore Our Menu</button>
+                    </div>
+                    <div class="story-images" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div class="story-img-wrapper" style="border: 2px solid var(--border-color); border-radius: 12px; overflow: hidden; box-shadow: var(--shadow-soft);">
+                            <img src="assets/about_coffee.jpg" alt="Artisanal coffee roasting beans" style="width: 100%; height: 280px; object-fit: cover;">
                         </div>
-                        <div class="form-group">
-                            <label class="form-label" for="reservePhone">Phone Number</label>
-                            <input type="tel" id="reservePhone" required class="form-control" placeholder="e.g., 03001234567">
+                        <div class="story-img-wrapper" style="border: 2px solid var(--border-color); border-radius: 12px; overflow: hidden; box-shadow: var(--shadow-soft); margin-top: 30px;">
+                            <img src="assets/about_interior.jpg" alt="Cozy cafe lounge interior design" style="width: 100%; height: 280px; object-fit: cover;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- AI Assistance Tab -->
+    <div class="tab-content" id="tab-ai">
+        <section class="ai-section" style="padding: 80px 0;">
+            <div class="container">
+                <h2 class="section-title">Ayssh Cafe <span>AI Assistant</span></h2>
+                
+                <div class="ai-chat-container">
+                    <!-- AI Sidebar Suggestions -->
+                    <div class="ai-chat-sidebar">
+                        <h4>Suggested Questions</h4>
+                        <div class="chat-chip" data-msg="What are your best selling items?">What are your best sellers?</div>
+                        <div class="chat-chip" data-msg="What is the price of Velvet Rose Cake?">Velvet Rose Cake price?</div>
+                        <div class="chat-chip" data-msg="What are your cafe timings?">What are your timings?</div>
+                        <div class="chat-chip" data-msg="How can I book a table?">How to reserve a table?</div>
+                        <div class="chat-chip" data-msg="Where is the cafe located?">Where are you located?</div>
+                    </div>
+                    
+                    <!-- Chat Box Window -->
+                    <div class="ai-chat-window">
+                        <div class="ai-chat-header">
+                            <div class="avatar-info">
+                                <div class="avatar"><i class="fa-solid fa-robot"></i></div>
+                                <div>
+                                    <h5>Barista Bot</h5>
+                                    <span class="status-online">Online</span>
+                                </div>
+                            </div>
                         </div>
                         
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label class="form-label" for="reserveGuests">Party Size</label>
-                                <select id="reserveGuests" class="form-control">
-                                    <option value="1">1 Guest</option>
-                                    <option value="2" selected>2 Guests</option>
-                                    <option value="4">4 Guests</option>
-                                    <option value="6">6 Guests</option>
-                                    <option value="8">8 Guests</option>
-                                    <option value="10">10+ Guests</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label" for="reserveTable">Table Layout</label>
-                                <select id="reserveTable" class="form-control">
-                                    <option value="Standard Sitting">Standard Sitting</option>
-                                    <option value="Window View">Window View (Premium)</option>
-                                    <option value="Cozy Corner">Cozy Corner</option>
-                                    <option value="Outdoor Lounge">Outdoor Lounge</option>
-                                </select>
+                        <div class="ai-chat-messages" id="chatMessages">
+                            <div class="chat-message bot-msg">
+                                <p>Hello! I am your Ayssh Cafe Barista Bot. Ask me anything about our coffees, pastries, timings, or bookings!</p>
+                                <span class="time-stamp">Just now</span>
                             </div>
                         </div>
-
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label class="form-label" for="reserveDate">Reservation Date</label>
-                                <input type="date" id="reserveDate" required class="form-control">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label" for="reserveTime">Time Slot</label>
-                                <select id="reserveTime" class="form-control">
-                                    <option value="Afternoon (12:00 PM - 3:00 PM)">Afternoon (12pm - 3pm)</option>
-                                    <option value="High Tea (3:00 PM - 6:00 PM)">High Tea (3pm - 6pm)</option>
-                                    <option value="Dinner (6:00 PM - 9:00 PM)">Dinner (6pm - 9pm)</option>
-                                    <option value="Late Night (9:00 PM - 12:00 AM)">Late Night (9pm - 12am)</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <button type="submit" class="btn" style="width: 100%; justify-content: center; margin-top: 10px;">
-                            <i class="fa-solid fa-calendar-check"></i> Book My Table
-                        </button>
-                    </form>
+                        
+                        <!-- Input Panel -->
+                        <form class="ai-chat-input-area" id="chatInputForm">
+                            <input type="text" id="chatInput" placeholder="Type a message or click a suggestion..." required autocomplete="off">
+                            <button type="submit" class="chat-send-btn" aria-label="Send message">
+                                <i class="fa-solid fa-paper-plane"></i>
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
+    </div>
 
-    <!-- Tracking Dashboard Section -->
-    <section class="tracking-section" id="track">
-        <div class="container">
-            <h2 class="section-title">Track Order & <span>Reservations</span></h2>
-            
-            <!-- Lookup search panel -->
-            <div class="tracking-search-box">
-                <input type="text" id="trackingSearchInput" class="form-control" placeholder="Enter your Phone Number or Order/Booking ID...">
-                <button class="btn" id="trackingSearchBtn">
-                    <i class="fa-solid fa-magnifying-glass"></i> Search
-                </button>
-            </div>
+    <!-- Tracking Dashboard Tab -->
+    <div class="tab-content" id="tab-track">
+        <section class="tracking-section">
+            <div class="container">
+                <h2 class="section-title">Track Order & <span>Reservations</span></h2>
+                
+                <!-- Lookup Search Panel -->
+                <div class="tracking-search-box">
+                    <input type="text" id="trackingSearchInput" class="form-control" placeholder="Enter your Phone Number or Order/Booking ID...">
+                    <button class="btn" id="trackingSearchBtn">
+                        <i class="fa-solid fa-magnifying-glass"></i> Search
+                    </button>
+                </div>
 
-            <!-- History Dashboard Grid -->
-            <div class="history-grid" id="trackingDashboard">
-                <!-- Dynamically loaded history details go here -->
-                <div class="empty-cart-msg" style="padding: 20px 0; background: var(--bg-tertiary); border: 1px dashed var(--border-color); border-radius: 12px;">
-                    <i class="fa-solid fa-clock-rotate-left"></i>
-                    <p>Enter your phone number or reservation code above to check status in real-time, or place an order to see its progress instantly.</p>
+                <!-- History Dashboard Grid -->
+                <div class="history-grid" id="trackingDashboard">
+                    <div class="empty-cart-msg" style="padding: 20px 0; background: var(--bg-tertiary); border: 1px dashed var(--border-color); border-radius: 12px;">
+                        <i class="fa-solid fa-clock-rotate-left"></i>
+                        <p>Enter your phone number or reservation code above to check status in real-time.</p>
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
+    </div>
 
     <!-- Slide-in Cart Sidebar (Drawer) -->
     <div class="drawer" id="cartDrawer">
@@ -222,7 +305,7 @@
     </div>
 
     <!-- Footer -->
-    <footer>
+    <footer style="margin-top: 0;">
         <div class="container">
             <div class="footer-logo">Ayssh <span>Cafe</span></div>
             <p class="footer-desc">Premium flavors and fresh bakes served in the heart of the city. Join us for a delightful culinary escape.</p>

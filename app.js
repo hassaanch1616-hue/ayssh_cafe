@@ -152,61 +152,51 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             mainHeader.classList.remove('scrolled');
         }
-        activateNavLinkOnScroll();
     });
 
-    // Navigation and Scrolling
+    // --- SPA VIEW TAB SWITCHING ---
     const navLinks = document.querySelectorAll('.nav-link');
     navLinks.forEach(link => {
         link.addEventListener('click', (e) => {
-            const targetId = link.getAttribute('data-target');
-            scrollToSection(targetId);
-            
-            navLinks.forEach(nl => nl.classList.remove('active'));
-            link.classList.add('active');
+            const targetTab = link.getAttribute('data-target');
+            switchTab(targetTab);
         });
     });
 
-    // Button click redirects
-    document.getElementById('navBookBtn').addEventListener('click', () => scrollToSection('book'));
-    document.getElementById('heroMenuBtn').addEventListener('click', () => scrollToSection('menu'));
-    document.getElementById('heroBookBtn').addEventListener('click', () => scrollToSection('book'));
-
-    function scrollToSection(id) {
-        const element = document.getElementById(id);
-        if (element) {
-            const headerOffset = 80;
-            const elementPosition = element.getBoundingClientRect().top;
-            const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-            
-            window.scrollTo({
-                top: offsetPosition,
-                behavior: 'smooth'
-            });
+    // SPA switchTab helper function
+    function switchTab(tabId) {
+        // Toggle tab content display
+        document.querySelectorAll('.tab-content').forEach(tc => {
+            tc.classList.remove('active');
+        });
+        const activeTabEl = document.getElementById(tabId);
+        if (activeTabEl) {
+            activeTabEl.classList.add('active');
         }
-    }
 
-    function activateNavLinkOnScroll() {
-        const sections = ['home', 'menu', 'book', 'track'];
-        const scrollPosition = window.scrollY + 120;
-
-        sections.forEach(secId => {
-            const el = document.getElementById(secId);
-            if (el) {
-                const top = el.offsetTop;
-                const height = el.offsetHeight;
-                if (scrollPosition >= top && scrollPosition < top + height) {
-                    navLinks.forEach(link => {
-                        if (link.getAttribute('data-target') === secId) {
-                            link.classList.add('active');
-                        } else {
-                            link.classList.remove('active');
-                        }
-                    });
-                }
+        // Toggle active style on links
+        navLinks.forEach(nl => {
+            if (nl.getAttribute('data-target') === tabId) {
+                nl.classList.add('active');
+            } else {
+                nl.classList.remove('active');
             }
         });
+
+        // Reset scroll position and save state
+        window.scrollTo(0, 0);
+        localStorage.setItem('ayssh_active_tab', tabId);
     }
+
+    // Initial default tab restore
+    const savedActiveTab = localStorage.getItem('ayssh_active_tab') || 'tab-home';
+    switchTab(savedActiveTab);
+
+    // Dynamic redirection bindings
+    document.getElementById('navBookBtn').addEventListener('click', () => switchTab('tab-book'));
+    document.getElementById('heroMenuBtn').addEventListener('click', () => switchTab('tab-menu'));
+    document.getElementById('heroBookBtn').addEventListener('click', () => switchTab('tab-book'));
+    document.getElementById('storyMenuBtn').addEventListener('click', () => switchTab('tab-menu'));
 
     // --- MENU CONTROLLER ---
     function getAdjustedPrice(itemId, basePrice) {
@@ -498,9 +488,9 @@ document.addEventListener('DOMContentLoaded', () => {
             // Show toast & switch to tracking
             showToast(`Order Placed successfully! Code: ${orderId}`);
             
-            // Auto scroll to tracking section and query this order
+            // Auto switch to tracking section and query this order
             document.getElementById('trackingSearchInput').value = orderId;
-            scrollToSection('track');
+            switchTab('tab-track');
             performTrackingSearch(orderId);
         }
     });
@@ -559,9 +549,9 @@ document.addEventListener('DOMContentLoaded', () => {
         // Show success Toast & display in tracking
         showToast(`Table reserved successfully! Code: ${bookingId}`);
 
-        // Scroll to tracking and search
+        // Search booking code in tracking tab
         document.getElementById('trackingSearchInput').value = bookingId;
-        scrollToSection('track');
+        switchTab('tab-track');
         performTrackingSearch(bookingId);
     });
 
@@ -593,7 +583,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Refresh layout automatically when snapshot listeners change
     function refreshTrackingDashboard() {
         const query = trackingSearchInput.value.trim();
         if (query) {
@@ -806,6 +795,123 @@ document.addEventListener('DOMContentLoaded', () => {
             showToast(`Reservation ${id} successfully cancelled.`);
             refreshTrackingDashboard();
         }
+    }
+
+    // --- AI ASSISTANT CHATBOT LOGIC ---
+    const chatInputForm = document.getElementById('chatInputForm');
+    const chatInput = document.getElementById('chatInput');
+    const chatMessages = document.getElementById('chatMessages');
+
+    if (chatInputForm) {
+        chatInputForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const text = chatInput.value.trim();
+            if (text) {
+                sendUserMessage(text);
+                chatInput.value = '';
+            }
+        });
+    }
+
+    // Handle suggested chips click
+    document.querySelectorAll('.chat-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+            const msg = chip.getAttribute('data-msg');
+            sendUserMessage(msg);
+        });
+    });
+
+    function sendUserMessage(text) {
+        // 1. Render User message in UI
+        const msgEl = document.createElement('div');
+        msgEl.className = 'chat-message user-msg';
+        msgEl.innerHTML = `<p>${escapeHTML(text)}</p><span class="time-stamp">${getCurrentTimeStr()}</span>`;
+        chatMessages.appendChild(msgEl);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+
+        // 2. Render typing indicator
+        const typingEl = document.createElement('div');
+        typingEl.className = 'typing-indicator';
+        typingEl.id = 'chatTypingIndicator';
+        typingEl.innerHTML = `
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+        `;
+        chatMessages.appendChild(typingEl);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+
+        // 3. Generate response with delay
+        setTimeout(() => {
+            // Remove typing indicator
+            const indicator = document.getElementById('chatTypingIndicator');
+            if (indicator) indicator.remove();
+
+            const botResponse = generateAIResponse(text);
+            const botEl = document.createElement('div');
+            botEl.className = 'chat-message bot-msg';
+            botEl.innerHTML = `<p>${botResponse}</p><span class="time-stamp">${getCurrentTimeStr()}</span>`;
+            chatMessages.appendChild(botEl);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }, 1000);
+    }
+
+    function generateAIResponse(text) {
+        const query = text.toLowerCase();
+
+        // 1. Timings Queries
+        if (query.includes('timings') || query.includes('time') || query.includes('open') || query.includes('hour')) {
+            return "Ayssh Cafe is open daily from <strong>12:00 PM to 12:00 AM</strong>. Join us for lunch, high tea, or dinner!";
+        }
+
+        // 2. Best Sellers
+        if (query.includes('best seller') || query.includes('popular') || query.includes('recommend') || query.includes('favorite') || query.includes('special')) {
+            return "Our customer favorites are the <strong>Caramel Macchiato (Rs. 550)</strong>, <strong>Traditional Karak Chai (Rs. 250)</strong>, and the decadent <strong>Velvet Rose Cake (Rs. 1,200)</strong>! You should definitely try them.";
+        }
+
+        // 3. Coffee
+        if (query.includes('coffee') || query.includes('cappuccino') || query.includes('macchiato') || query.includes('espresso')) {
+            return "We brew premium specialty espresso! You can choose our <strong>Premium Cappuccino (Rs. 450)</strong> or our sweet <strong>Caramel Macchiato (Rs. 550)</strong>. All our beans are roasted in-house.";
+        }
+
+        // 4. Tea / Chai
+        if (query.includes('tea') || query.includes('chai') || query.includes('karak') || query.includes('noon')) {
+            return "We are famous for our <strong>Traditional Karak Chai (Rs. 250)</strong> simmered with milk, cardamom, and saffron. We also serve Kashmiri Noon Chai.";
+        }
+
+        // 5. Cakes
+        if (query.includes('cake') || query.includes('truffle') || query.includes('rose') || query.includes('lemon')) {
+            return "Our cakes are baked fresh daily! We have: <br>• <strong>Velvet Rose Cake</strong> (Rs. 1,200)<br>• <strong>Chocolate Fudge Truffle</strong> (Rs. 950)<br>• <strong>Lemon Drizzle Cake</strong> (Rs. 850)";
+        }
+
+        // 6. Cookies
+        if (query.includes('cookie') || query.includes('biscotti') || query.includes('biscuit') || query.includes('almond')) {
+            return "Indulge in our oven-baked cookies:<br>• <strong>Choco-Chip Giant Cookie</strong> (Rs. 180)<br>• <strong>Butter Almond Biscotti</strong> (Rs. 220)<br>• <strong>Coconut Crunch Biscuits</strong> (Rs. 150)";
+        }
+
+        // 7. Booking / Reservation
+        if (query.includes('book') || query.includes('reserve') || query.includes('table') || query.includes('seat')) {
+            return "You can book a table instantly! Just head over to our <strong>'Book Table'</strong> tab, select your guests, layout preference (Window view, Cozy corner), date, and slot, and we'll save your table.";
+        }
+
+        // 8. Location
+        if (query.includes('location') || query.includes('located') || query.includes('where') || query.includes('place') || query.includes('address')) {
+            return "Ayssh Cafe is located in the premium commercial hub at <strong>Block C, Heritage Boulevard, Lahore</strong>. Find us next to the old fountain!";
+        }
+
+        // Default response
+        return "I'd love to help you with that! You can ask me about our coffee brew types, gourmet cake flavors, timings, location, or how to reserve a table.";
+    }
+
+    function getCurrentTimeStr() {
+        const now = new Date();
+        return now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+
+    function escapeHTML(text) {
+        const div = document.createElement('div');
+        div.innerText = text;
+        return div.innerHTML;
     }
 
     // --- HELPER TOAST NOTIFICATION ---
