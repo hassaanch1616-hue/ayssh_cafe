@@ -1200,6 +1200,7 @@
                     localStorage.setItem('ayssh_orders', JSON.stringify(orders));
                     showToast(`Order ${id} status updated to ${newStatus}.`);
                     renderKPIs();
+                    renderOrdersTable(); // Refresh the table UI
                 }
             };
 
