@@ -289,7 +289,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (existingItem) {
             existingItem.quantity += 1;
-            // Update price in case it has been changed in menu sync
             existingItem.price = currentPrice;
         } else {
             cart.push({
@@ -404,7 +403,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.style.overflow = 'hidden';
     }
 
-    // Export function to window so we can close from outside if needed
     window.closeDrawer = function() {
         cartDrawer.classList.remove('open');
         uiOverlay.classList.remove('show');
@@ -433,7 +431,6 @@ document.addEventListener('DOMContentLoaded', () => {
             checkoutForm.style.display = 'block';
             checkoutActionBtn.textContent = 'Confirm & Place Order';
             
-            // Scroll to the bottom of the drawer to see checkout form
             setTimeout(() => {
                 cartDrawer.querySelector('.drawer-body').scrollTo({
                     top: checkoutForm.offsetTop,
@@ -457,6 +454,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const orderId = "ORD-" + String(nextOrderNum).padStart(4, '0');
             const total = cart.reduce((sum, item) => sum + (getAdjustedPrice(item.id, item.price) * item.quantity), 0);
+            
             const itemsArray = cart.map(item => ({
                 name: item.title,
                 quantity: item.quantity
@@ -740,7 +738,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const bookingCard = document.createElement('div');
             bookingCard.className = 'history-card';
-            // Use different border indicator left color for booking
             bookingCard.style.borderColor = 'rgba(201, 160, 84, 0.4)';
             
             bookingCard.innerHTML = `
@@ -829,7 +826,6 @@ document.addEventListener('DOMContentLoaded', () => {
     updateCartBadge();
     renderCart();
 
-    // Auto set date input range in reservation (starts from today)
     const today = new Date().toISOString().split('T')[0];
     document.getElementById('reserveDate').setAttribute('min', today);
 });
